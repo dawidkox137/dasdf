@@ -82,7 +82,7 @@ if(navigator.connection){card('network','Connection Type',navigator.connection.e
 card('browser','User Agent',navigator.userAgent);card('browser','Languages',navigator.languages?navigator.languages.join(', '):navigator.language);card('browser','Cookies Enabled',navigator.cookieEnabled?'Yes':'No');card('browser','Screen',`${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
 card('sensors','Device Orientation',typeof DeviceOrientationEvent!=='undefined'?'Supported':'Unsupported');card('sensors','Device Motion',typeof DeviceMotionEvent!=='undefined'?'Supported':'Unsupported');card('sensors','Device Light',typeof AmbientLightSensor!=='undefined'?'Supported':'Unsupported');
 card('apis','Service Worker',!!navigator.serviceWorker?'Supported':'Unsupported');card('apis','Clipboard',!!navigator.clipboard?'Supported':'Unsupported');card('apis','Payment Request',!!window.PaymentRequest?'Supported':'Unsupported');card('apis','Web Bluetooth',!!navigator.bluetooth?'Supported':'Unsupported');card('apis','Web USB',!!navigator.usb?'Supported':'Unsupported');card('apis','Web Share',!!navigator.share?'Supported':'Unsupported');card('apis','Web NFC',!!navigator.nfc?'Supported':'Unsupported');card('apis','Permissions API',!!navigator.permissions?'Supported':'Unsupported');
-window.__DIAG_DATA=DATA;document.querySelectorAll('.card').forEach(c=>c.style.display='block');show('computer');}
+window.__DIAG_DATA=DATA;show('computer');}
 gather();
 </script>
 </body>
