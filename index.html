@@ -31,6 +31,7 @@ html, body {
 
 body {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem;
@@ -87,8 +88,8 @@ body {
     display: flex;
     width: 100%;
     max-width: 1200px;
-    height: 80vh;
-    max-height: 800px;
+    height: 70vh;
+    max-height: 700px;
     background: var(--surface-color);
     border-radius: 16px;
     overflow: hidden;
@@ -202,8 +203,20 @@ h2 {
 .data-value.danger {color: var(--danger-color);}
 .data-value.warning {color: var(--warning-color);}
 
+.footer {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--label-color);
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.footer span {font-family: 'Roboto Mono', monospace; color: var(--value-color);}
+
 @media (max-width: 900px) {
-    .dashboard-container {flex-direction: column; height: 100vh; max-height: none;}
+    .dashboard-container {flex-direction: column; height: 60vh; max-height: none;}
     .sidebar {flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color);}
     .category-list {display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;}
 }
@@ -231,10 +244,30 @@ h2 {
     </div>
 </div>
 
+<div class="footer">
+    Current Time: <span id="current-time">--:--:--</span> | Mouse Movements: <span id="mouse-count">0</span> | All data is processed locally and never sent or logged.
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     const reportContent = document.getElementById('report-content');
+    const currentTimeEl = document.getElementById('current-time');
+    const mouseCountEl = document.getElementById('mouse-count');
+
+    let mouseMovements = 0;
+
+    document.addEventListener('mousemove', () => {
+        mouseMovements++;
+        mouseCountEl.textContent = mouseMovements;
+    });
+
+    const updateTime = () => {
+        const now = new Date();
+        currentTimeEl.textContent = now.toLocaleTimeString();
+    };
+    setInterval(updateTime, 1000);
+    updateTime();
 
     const addInfo = (category, label, value, type = '') => {
         if (!value && typeof value !== 'number') value = 'N/A';
