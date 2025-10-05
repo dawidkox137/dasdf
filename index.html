@@ -23,7 +23,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 14px; }
         body {
-            background-color: var(--bg-color );
+            background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
             display: flex;
@@ -46,7 +46,7 @@
             animation: fadeIn 1s ease-out;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-        
+
         .sidebar {
             flex: 0 0 280px;
             background: linear-gradient(180deg, #1a1a1a, #141414);
@@ -59,7 +59,6 @@
             overflow-y: auto;
         }
         .main-content::-webkit-scrollbar { width: 4px; }
-        .main-content::-webkit-scrollbar-track { background: transparent; }
         .main-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
         h1, h2 {
@@ -102,9 +101,12 @@
             opacity: 0;
             display: none;
         }
-        .data-item.visible { display: block; }
+        .data-item.visible {
+            display: block;
+            opacity: 1;
+        }
         @keyframes itemFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        
+
         .data-label {
             display: block;
             color: var(--label-color);
@@ -146,7 +148,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const reportContent = document.getElementById('report-content');
-            
+
             const addInfo = (category, label, value, type = '') => {
                 if (!value && typeof value !== 'number') value = 'N/A';
                 const item = document.createElement('div');
@@ -165,15 +167,17 @@
                     let delay = 0;
                     allItems.forEach(item => {
                         if (item.dataset.category === category) {
+                            item.style.display = 'block';
+                            item.style.animationDelay = `${delay * 0.05}s`;
                             item.classList.add('visible');
-                            item.style.animationDelay = `${delay * 50}ms`;
                             delay++;
                         } else {
+                            item.style.display = 'none';
                             item.classList.remove('visible');
                         }
                     });
-                    const activeCat = document.querySelector(`[id="cat-${category}"]`);
-                    reportTitle.textContent = activeCat.textContent;
+                    const activeCat = document.querySelector(`#cat-${category}`);
+                    if (activeCat) reportTitle.textContent = activeCat.textContent;
                 };
 
                 categories.forEach(cat => {
@@ -202,28 +206,12 @@
                 try {
                     const gl = document.createElement('canvas').getContext('webgl');
                     const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    return gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL);
+                    return rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Unavailable';
                 } catch (e) { return 'Unavailable'; }
             };
 
-            const getLocalIp = () => {
-                try {
-                    const pc = new RTCPeerConnection({iceServers: []});
-                    pc.createDataChannel('');
-                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
-                    pc.onicecandidate = e => {
-                        if (!e || !e.candidate || !e.candidate.candidate) return;
-                        const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
-                        if (ip) {
-                            addInfo('network', 'Local IP', ip, 'danger');
-                            pc.onicecandidate = null;
-                        }
-                    };
-                } catch (e) {}
-            };
-
             const getFontFingerprint = () => {
-                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact', 'Calibri', 'Candara', 'Segoe UI', 'Consolas', 'Cambria'];
+                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Comic Sans MS', 'Segoe UI', 'Consolas'];
                 const detected = fontList.filter(font => {
                     const testSpan = document.createElement('span');
                     testSpan.style.fontFamily = 'monospace';
@@ -235,7 +223,23 @@
                     document.body.removeChild(testSpan);
                     return monoWidth !== fontWidth;
                 });
-                addInfo('browser', 'Detected Fonts', detected.join(', '), 'warning');
+                addInfo('browser', 'Detected Fonts', detected.join(', ') || 'Unknown', 'warning');
+            };
+
+            const getLocalIp = () => {
+                try {
+                    const pc = new RTCPeerConnection({iceServers: []});
+                    pc.createDataChannel('');
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                    pc.onicecandidate = e => {
+                        if (!e.candidate) return;
+                        const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
+                        if (ip) {
+                            addInfo('network', 'Local IP', ip, 'danger');
+                            pc.close();
+                        }
+                    };
+                } catch (e) {}
             };
 
             const gatherData = async () => {
@@ -243,42 +247,41 @@
                 addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
                 if (navigator.deviceMemory) addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
                 addInfo('computer', 'GPU', getGpuInfo(), 'danger');
-                
+
                 try {
                     const battery = await navigator.getBattery();
                     addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
-                } catch (e) {}
-                
+                } catch {}
+
                 try {
                     const devices = await navigator.mediaDevices.enumerateDevices();
-                    const media = devices.filter(d => d.label).map(d => `${d.kind.replace('input', '')}: ${d.label.substring(0,30)}...`).join('  
-');
-                    if (media) addInfo('computer', 'Media Devices', media, 'danger');
-                } catch (e) {}
+                    const media = devices.filter(d => d.label).map(d => `${d.kind.replace('input','')}: ${d.label}`).join(', ');
+                    if (media) addInfo('computer', 'Media Devices', media, 'warning');
+                } catch {}
 
                 getLocalIp();
-                
+
                 try {
-                    const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
+                    const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
                     addInfo('network', 'Public IP', ipData.ip, 'danger');
-                    const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
+                    const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/`)).json();
                     addInfo('network', 'ISP', locData.org, 'warning');
                     addInfo('network', 'Location', `${locData.city}, ${locData.country_name}`, 'danger');
                     if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
-                        addInfo('network', 'VPN/Proxy', 'Detected', 'danger');
+                        addInfo('network', 'VPN/Proxy', 'Possible', 'warning');
                     }
-                } catch (e) {}
-                
+                } catch {}
+
                 if (navigator.connection) {
                     addInfo('network', 'Connection Type', navigator.connection.effectiveType);
                     addInfo('network', 'Downlink Speed', `${navigator.connection.downlink} Mbps`);
                 }
-                
+
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        addInfo('network', 'Precise GPS', `${pos.coords.latitude}, ${pos.coords.longitude} (acc: ${pos.coords.accuracy}m)`, 'danger');
+                        addInfo('network', 'Precise GPS', `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (±${pos.coords.accuracy}m)`, 'danger');
                     },
-                    (err) => {
+                    () => {
                         addInfo('network', 'Precise GPS', 'Access Denied', 'warning');
                     }, { enableHighAccuracy: true }
                 );
@@ -287,19 +290,17 @@
                 addInfo('browser', 'Languages', navigator.languages.join(', '));
                 addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
                 addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-                addInfo('browser', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'danger');
-                
+                addInfo('browser', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'warning');
+
                 if (navigator.plugins) {
                     const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
                     if (plugins) addInfo('browser', 'Browser Plugins', plugins, 'warning');
                 }
-                
+
                 getFontFingerprint();
             };
 
-            gatherData().then(() => {
-                setupCategories();
-            });
+            gatherData().then(setupCategories);
         });
     </script>
 </body>
