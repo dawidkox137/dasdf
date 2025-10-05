@@ -3,59 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM COMPROMISED // BREACH DETECTED</title>
+    <title>FATAL_ERROR :: SECURITY_BREACH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glow-color: #ff3b3b;
+            --main-color: #ff3b3b;
             --danger-color: #ff4d4d;
             --warning-color: #ffcc00;
-            --success-color: #00ffaa;
+            --info-color: #00ffaa;
             --bg-color: #000000;
+            --text-color: #e0e0e0;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background-color: var(--bg-color );
-            color: #e0e0e0;
+            color: var(--text-color);
             font-family: 'Roboto Mono', monospace;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
             overflow: hidden;
-            display: grid;
-            place-items: center;
+            display: flex;
             position: relative;
         }
-        
         body::before {
             content: '';
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(255, 59, 59, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 59, 59, 0.07) 1px, transparent 1px);
-            background-size: 2.5rem 2.5rem;
-            z-index: 0;
-            animation: scanlines 8s linear infinite;
+            background-image: linear-gradient(rgba(255, 59, 59, 0.05) 1px, transparent 1px);
+            background-size: 1.5rem 1.5rem;
+            animation: scanlines 10s linear infinite;
         }
-        
-        @keyframes scanlines { from { background-position: 0 0; } to { background-position: 0 2.5rem; } }
-
+        @keyframes scanlines { to { background-position: 0 1.5rem; } }
         .layout-container {
             display: flex;
             flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding: 15px;
-            gap: 20px;
+            width: 100%; height: 100%;
+            padding: 15px; gap: 20px;
             z-index: 1;
         }
-
         .main-container {
             flex: 1;
             display: flex;
@@ -64,208 +50,170 @@
             align-items: center;
             max-width: 600px;
         }
-
-        .loading-circle {
-            width: 50px; height: 50px;
-            border: 2px solid rgba(255, 59, 59, 0.3);
-            border-top: 2px solid var(--glow-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 25px;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            box-shadow: 0 0 20px var(--glow-color);
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
         .loading-text {
-            font-size: 16px; font-weight: 700;
+            font-size: 18px; font-weight: 700;
             margin-bottom: 25px;
             color: #fff;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            text-shadow: 0 0 8px var(--glow-color);
+            text-shadow: 0 0 10px var(--main-color);
         }
-
         .progress-container {
-            width: 100%; height: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-            overflow: hidden;
+            width: 100%; height: 4px;
+            background: rgba(255, 59, 59, 0.1);
+            border-radius: 2px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255, 59, 59, 0.3);
         }
-
         .progress-bar {
             height: 100%; width: 0%;
-            background: var(--glow-color);
-            border-radius: 3px;
-            animation: pulse-glow 1s ease-in-out infinite;
+            background: var(--main-color);
+            box-shadow: 0 0 15px 2px var(--main-color);
             transition: width 0.1s linear;
         }
-
-        @keyframes pulse-glow { 50% { box-shadow: 0 0 15px 3px var(--glow-color); } }
-
         .timer { font-size: 12px; color: #ccc; text-transform: uppercase; }
-
         .info-container {
-            flex: 1.2;
+            flex: 1.5;
             height: 100%;
-            overflow-y: auto; /* ZAPEWNIA SCROLLOWANIE */
-            border-left: 1px solid var(--glow-color);
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(3px);
+            overflow-y: auto;
+            border-left: 1px solid var(--main-color);
+            padding-left: 15px;
+            background: rgba(0, 0, 0, 0.5);
         }
-        
-        .info-container::-webkit-scrollbar { width: 4px; }
+        .info-container::-webkit-scrollbar { width: 3px; }
         .info-container::-webkit-scrollbar-track { background: transparent; }
-        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); border-radius: 4px; }
-
+        .info-container::-webkit-scrollbar-thumb { background: var(--main-color); }
         .info-item {
             margin-bottom: 8px;
             font-size: 12px;
             color: #a0a0a0;
-            line-height: 1.5;
             opacity: 0;
-            animation: itemFadeInUp 0.3s ease forwards;
+            animation: itemFadeIn 0.2s ease forwards;
             word-break: break-all;
         }
-
-        .info-value { color: var(--success-color); font-weight: 500; }
+        .info-value { color: var(--info-color); }
         .info-item.warning .info-value { color: var(--warning-color); }
         .info-item.danger .info-value { color: var(--danger-color); font-weight: 700; }
-
-        @keyframes itemFadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        .hidden { opacity: 0; visibility: hidden; transform: translateY(10px); }
-        .fade-in { opacity: 1; visibility: visible; transform: translateY(0); transition: all 0.5s ease; }
-        .loading-circle.fade-out { opacity: 0; transform: scale(0.9); }
-
+        .info-item.category .info-value { color: var(--warning-color); font-weight: 700; }
+        @keyframes itemFadeIn { to { opacity: 1; } }
+        .hidden { opacity: 0; visibility: hidden; }
+        .fade-in { opacity: 1; visibility: visible; transition: all 0.5s ease; }
         @media (max-width: 900px) {
             .layout-container { flex-direction: column; padding: 10px; }
             .main-container { flex: 0; width: 100%; padding-top: 15px; }
-            .info-container { flex: 1; width: 100%; border-left: none; border-top: 1px solid var(--glow-color); margin-top: 15px; }
-            .loading-text { font-size: 14px; }
-            .info-item { font-size: 11px; }
+            .info-container { flex: 1; width: 100%; border-left: none; border-top: 1px solid var(--main-color); margin-top: 15px; }
         }
     </style>
 </head>
 <body>
     <div class="layout-container">
         <div class="main-container">
-            <div class="loading-circle" id="loadingCircle"></div>
-            <div class="loading-text hidden" id="loadingText">ZŁAMANO ZABEZPIECZENIA</div>
-            <div class="progress-container hidden" id="progressContainer">
+            <div class="loading-text hidden fade-in" id="loadingText">ZŁAMANO ZABEZPIECZENIA</div>
+            <div class="progress-container hidden fade-in">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <div class="timer hidden" id="timer">SYSTEM SKOMPROMITOWANY. CZAS DO ZABLOKOWANIA: <span id="timeLeft">30</span>s</div>
+            <div class="timer hidden fade-in" id="timer">SESJA ZAKOŃCZONA ZA: <span id="timeLeft">20</span>s</div>
         </div>
-        <div class="info-container hidden" id="infoContainer"></div>
+        <div class="info-container hidden fade-in" id="infoContainer"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 30;
+            const TOTAL_TIME = 20;
+            const REDIRECT_URL = 'https://www.google.com/search?q=zgłoszenie+przestępstwa+cyberbezpieczeństwo';
             let timeLeft = TOTAL_TIME;
-            const REDIRECT_URL = 'https://www.google.com/search?q=wezwij+pomoc+policyjną+atak+hakerski';
+            let infoDelay = 0;
 
             const progressBar = document.getElementById('progressBar' );
             const timeLeftSpan = document.getElementById('timeLeft');
             const loadingText = document.getElementById('loadingText');
+            const infoContainer = document.getElementById('infoContainer');
 
-            function init() {
-                document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in'));
-                setTimeout(() => document.getElementById('loadingCircle').classList.add('fade-out'), 2000);
-                
-                const timerInterval = setInterval(() => {
-                    timeLeft--;
-                    if (timeLeftSpan) timeLeftSpan.textContent = timeLeft;
-                    const progress = (TOTAL_TIME - timeLeft) / TOTAL_TIME * 100;
-                    progressBar.style.width = `${Math.min(progress, 100)}%`;
-
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        loadingText.textContent = "SYSTEM ZABLOKOWANY. LOGI PRZESŁANE.";
-                        setTimeout(() => window.location.href = REDIRECT_URL, 2000);
-                    }
-                }, 1000);
-                
-                gatherAndDisplayInfo();
-            }
-
-            let infoDelay = 0;
-            function addInfoItem(label, value, type = '') {
-                const infoContainer = document.getElementById('infoContainer');
-                if (!infoContainer || !value) return;
+            const addInfoItem = (label, value, type = '') => {
+                if (!value) return;
                 const item = document.createElement('div');
                 item.className = `info-item ${type}`;
-                item.style.animationDelay = `${infoDelay * 25}ms`; // Jeszcze szybsze pojawianie się
+                item.style.animationDelay = `${infoDelay * 20}ms`;
                 item.innerHTML = `${label}: <span class="info-value">${value}</span>`;
                 infoContainer.appendChild(item);
                 infoDelay++;
-            }
+            };
 
-            async function gatherAndDisplayInfo() {
-                addInfoItem('STATUS', 'KRYTYCZNY BŁĄD ZABEZPIECZEŃ', 'danger');
-                
-                // --- DANE O KOMPUTERZE ---
-                addInfoItem('--- DANE O JEDNOSTCE ---', '--------------------', 'warning');
-                addInfoItem('SYSTEM OPERACYJNY', navigator.platform, 'danger');
-                if (navigator.cpuArchitecture) addInfoItem('ARCHITEKTURA CPU', navigator.cpuArchitecture, 'danger');
-                addInfoItem('RDZENIE LOGICZNE CPU', navigator.hardwareConcurrency, 'danger');
-                if (navigator.deviceMemory) addInfoItem('PAMIĘĆ RAM (szacowana)', `${navigator.deviceMemory} GB`, 'danger');
+            const gatherData = async () => {
+                // --- [JEDNOSTKA] ---
+                addInfoItem('[JEDNOSTKA]', '------------------', 'category');
+                addInfoItem('System', navigator.platform, 'danger');
+                if (navigator.cpuArchitecture) addInfoItem('Architektura CPU', navigator.cpuArchitecture, 'danger');
+                addInfoItem('Rdzenie CPU', navigator.hardwareConcurrency, 'danger');
+                if (navigator.deviceMemory) addInfoItem('Pamięć RAM', `${navigator.deviceMemory} GB`, 'danger');
                 try {
                     const canvas = document.createElement('canvas');
-                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    const gl = canvas.getContext('webgl');
                     const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    const gpu = rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Maskowana';
-                    addInfoItem('KARTA GRAFICZNA (GPU)', gpu, 'danger');
+                    addInfoItem('Karta Graficzna', gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL), 'danger');
                 } catch (e) {}
                 try {
                     const battery = await navigator.getBattery();
-                    addInfoItem('POZIOM BATERII', `${(battery.level * 100).toFixed(0)}%`, 'warning');
-                    addInfoItem('STATUS ŁADOWANIA', battery.charging ? 'Podłączono (Monitorowanie aktywne)' : 'Odłączono', 'warning');
+                    addInfoItem('Bateria', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(ŁADOWANIE)' : ''}`, 'warning');
                 } catch (e) {}
 
-                // --- DANE O INTERNECIE I SIECI ---
-                addInfoItem('--- DANE SIECIOWE ---', '--------------------', 'warning');
+                // --- [SIEĆ] ---
+                addInfoItem('[SIEĆ]', '------------------', 'category');
                 try {
-                    const pc = new RTCPeerConnection({iceServers:[]});
+                    const pc = new RTCPeerConnection();
                     pc.createDataChannel('');
-                    pc.createOffer().then(pc.setLocalDescription.bind(pc));
-                    pc.onicecandidate = (ice) => {
-                        if (ice && ice.candidate && ice.candidate.candidate) {
-                            const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate)[1];
-                            addInfoItem('LOKALNY ADRES IP', ip, 'danger');
-                            pc.onicecandidate = null;
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                    pc.onicecandidate = e => {
+                        if (e.candidate) {
+                            const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
+                            if (ip) {
+                                addInfoItem('Lokalny IP', ip, 'danger');
+                                pc.onicecandidate = null;
+                            }
                         }
                     };
                 } catch (e) {}
                 try {
                     const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
-                    addInfoItem('PUBLICZNY ADRES IP', ipData.ip, 'danger');
+                    addInfoItem('Publiczny IP', ipData.ip, 'danger');
                     const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
-                    addInfoItem('DOSTAWCA INTERNETU', locData.org, 'warning');
-                    addInfoItem('LOKALIZACJA (GEO-IP)', `${locData.city}, ${locData.country_name}`, 'danger');
-                    addInfoItem('KOORDYNATY (GPS)', `${locData.latitude}, ${locData.longitude}`, 'danger');
+                    addInfoItem('Dostawca', locData.org, 'warning');
+                    addInfoItem('Lokalizacja', `${locData.city}, ${locData.country_name}`, 'danger');
+                    addInfoItem('Koordynaty', `${locData.latitude}, ${locData.longitude}`, 'danger');
                 } catch (e) {}
                 if (navigator.connection) {
-                    addInfoItem('TYP POŁĄCZENIA', navigator.connection.effectiveType, 'warning');
-                    addInfoItem('PRĘDKOŚĆ (szacowana)', `${navigator.connection.downlink} Mbps`, 'warning');
-                    addInfoItem('PING (RTT)', `${navigator.connection.rtt} ms`, 'warning');
+                    addInfoItem('Typ Połączenia', navigator.connection.effectiveType, 'warning');
+                    addInfoItem('Prędkość', `${navigator.connection.downlink} Mbps`, 'warning');
                 }
 
-                // --- DANE O PRZEGLĄDARCE (FINGERPRINTING) ---
-                addInfoItem('--- ODCISK CYFROWY ---', '--------------------', 'warning');
-                addInfoItem('PRZEGLĄDARKA (USER AGENT)', navigator.userAgent, 'danger');
-                addInfoItem('JĘZYK', navigator.language);
-                addInfoItem('COOKIES', navigator.cookieEnabled ? 'Włączone (Śledzenie aktywne)' : 'Wyłączone', 'danger');
-                addInfoItem('ROZDZIELCZOŚĆ EKRANU', `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`, 'danger');
-                addInfoItem('ORIENTACJA EKRANU', screen.orientation.type, 'danger');
-                
-                addInfoItem('PODSUMOWANIE', 'SYSTEM W PEŁNI SKOMPROMITOWANY', 'danger');
-            }
+                // --- [ODCISK CYFROWY] ---
+                addInfoItem('[ODCISK CYFROWY]', '------------------', 'category');
+                addInfoItem('User Agent', navigator.userAgent, 'danger');
+                addInfoItem('Języki', navigator.languages.join(', '), 'warning');
+                addInfoItem('Rozdzielczość', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`, 'danger');
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    devices.forEach(device => {
+                        if (device.kind === 'audioinput') addInfoItem('Urządzenie Audio', device.label || 'Wykryto Mikrofon', 'danger');
+                        if (device.kind === 'videoinput') addInfoItem('Urządzenie Wideo', device.label || 'Wykryto Kamerę', 'danger');
+                    });
+                } catch (e) {}
+                addInfoItem('Podsumowanie', 'Identyfikacja Zakończona', 'danger');
+            };
+
+            const init = () => {
+                document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in'));
+                const timerInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeftSpan) timeLeftSpan.textContent = timeLeft;
+                    progressBar.style.width = `${(TOTAL_TIME - timeLeft) / TOTAL_TIME * 100}%`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        loadingText.textContent = "SYSTEM PRZEJĘTY";
+                        setTimeout(() => window.location.href = REDIRECT_URL, 1500);
+                    }
+                }, 1000);
+                gatherData();
+            };
 
             init();
         });
