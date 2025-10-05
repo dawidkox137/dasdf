@@ -1,209 +1,531 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Przygotowywanie pliku</title>
-<style>
-  :root{--bg:#0d47a1;--card:#0b3b78;--accent:#ffd54f;--muted:#cfe8ff}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#fff}
-  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
-  .card{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));border-radius:12px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,0.45);text-align:center}
-  h1{margin:0 0 6px;font-size:20px}
-  p.lead{margin:0 0 12px;color:var(--muted)}
-  .bar{height:14px;background:#123a72;border-radius:10px;overflow:hidden;margin:10px 0}
-  .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ffb74d);transition:width 200ms linear}
-  .time{font-size:13px;color:var(--muted);margin-bottom:8px}
-  .ads{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px}
-  .adcard{background:#072a4b;border-radius:8px;padding:8px;color:#eaf6ff;display:flex;flex-direction:column;gap:8px;align-items:stretch}
-  .admeta{font-size:13px}
-  .controls{margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
-  .btn{background:var(--accent);color:#042a3c;padding:10px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
-  .btn.secondary{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.06)}
-  .small{font-size:13px;color:var(--muted);margin-top:10px}
-  .ipbox{margin-top:10px;color:#e9f6ff;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;font-size:14px;display:inline-block;text-align:left}
-  @media(max-width:640px){.ads{grid-template-columns:1fr}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ładowanie...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Kontener główny */
+        .main-container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        /* Koło ładowania */
+        .loading-circle {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.1 );
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tekst ładowania */
+        .loading-text {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 40px;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        /* Kontener paska postępu */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* Tęczowy pasek postępu */
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, 
+                #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            animation: rainbow 3s linear infinite, subtle-pulse 2s ease-in-out infinite;
+            transition: width 0.2s ease;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { 
+                opacity: 0.9;
+                transform: scaleY(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scaleY(1.1);
+            }
+        }
+
+        /* Licznik czasu */
+        .timer {
+            font-size: 14px;
+            font-weight: 300;
+            margin-bottom: 50px;
+            color: #cccccc;
+        }
+
+        /* === ZMODYFIKOWANY KONTENER INFORMACJI === */
+        .info-container {
+            position: absolute;
+            top: 50%; /* Pozycjonowanie od góry */
+            left: 20px; /* Odstęp od lewej krawędzi */
+            transform: translateY(-50%); /* Wyśrodkowanie w pionie */
+            text-align: left; /* Wyrównanie tekstu do lewej */
+            width: auto; /* Szerokość dopasowana do zawartości */
+            max-width: 45%; /* Ograniczenie szerokości, aby nie nachodziło na środek */
+        }
+
+        .info-item {
+            display: block;
+            margin: 4px 0; /* Zwiększony margines dla czytelności */
+            font-size: 12px; /* Lekko powiększona czcionka */
+            color: #888888;
+            animation: fadeIn 0.3s ease forwards;
+            opacity: 0;
+            line-height: 1.4; /* Poprawiona wysokość linii */
+            white-space: nowrap; /* Zapobiega łamaniu linii */
+            overflow: hidden; /* Ukrywa nadmiarowy tekst */
+            text-overflow: ellipsis; /* Dodaje "..." na końcu długich linii */
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* Animacje */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* === ZMODYFIKOWANA RESPONSYWNOŚĆ === */
+        @media (max-width: 768px) {
+            .main-container {
+                width: 95%;
+            }
+            
+            .loading-circle {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .loading-text {
+                font-size: 16px;
+            }
+            
+            /* Zmiana pozycji informacji na małych ekranach (powrót na dół) */
+            .info-container {
+                top: auto; /* Anulowanie pozycjonowania od góry */
+                bottom: 10px; /* Ustawienie na dole */
+                left: 50%;
+                transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+                text-align: center; /* Wyśrodkowanie tekstu */
+                width: 95%;
+                max-width: 95%;
+            }
+
+            .info-item {
+                font-size: 11px;
+                margin: 2px 0;
+                white-space: normal; /* Pozwolenie na łamanie linii na małych ekranach */
+            }
+        }
+
+        /* Ukrywanie elementów na początku */
+        .hidden {
+            opacity: 0;
+        }
+
+        /* Animacja znikania koła ładowania */
+        .loading-circle.fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card" role="main" aria-live="polite">
-      <h1>Przygotowywanie pliku</h1>
-      <p class="lead">Proszę czekać. Trwa weryfikacja i przygotowanie zawartości — wyświetlane są materiały sponsorowane.</p>
+    <div class="main-container">
+        <!-- Koło ładowania -->
+        <div class="loading-circle" id="loadingCircle"></div>
+        
+        <!-- Tekst ładowania -->
+        <div class="loading-text fade-in hidden" id="loadingText">
+            Ładowanie pliku...
+        </div>
+        
+        <!-- Pasek postępu -->
+        <div class="progress-container fade-in hidden" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <!-- Licznik czasu -->
+        <div class="timer fade-in hidden" id="timer">
+            Pozostało: <span id="timeLeft">80</span>s
+        </div>
 
-      <div class="bar" aria-hidden="false"><div id="fill" class="fill"></div></div>
-      <div class="time" id="timeText">Etap 1: Pozostało 20s</div>
-
-      <div class="ads" id="adsArea" aria-live="polite" aria-atomic="true">
-        <!-- reklamy pojawią się jako embedy YouTube -->
-      </div>
-
-      <div class="controls" id="controls">
-        <button id="goBtn" class="btn hidden">Przejdź do pliku</button>
-        <button id="showIpBtn" class="btn secondary hidden">Pokaż moje IP i lokalizację</button>
-      </div>
-
-      <div class="small" id="note">Etap 1: 20s → Etap 2 (antibot): 40s. Po zakończeniu pojawi się przycisk.</div>
-
-      <div id="ipResult" class="ipbox hidden" aria-live="polite"></div>
     </div>
-  </div>
 
-<script>
-/* KONFIGURACJA */
-const PHASE1_SECONDS = 20;
-const PHASE2_SECONDS = 40;
-const AD_INTERVAL = 4; // co 4 s
-const DEST_URL = "https://limewire.com/d/Uwc3k#fBGsTokD52";
-
-/* dokładnie podane filmy (użyjemy embedów) */
-const videoIds = [
-  "ds6AqaOK-gQ",
-  "_kV87STn6FM",
-  "4Cw113pFkJo",
-  "062AaADlqZo",
-  "dQw4w9WgXcQ"
-];
-
-/* elementy DOM */
-const fillEl = document.getElementById('fill');
-const timeText = document.getElementById('timeText');
-const adsArea = document.getElementById('adsArea');
-const goBtn = document.getElementById('goBtn');
-const showIpBtn = document.getElementById('showIpBtn');
-const ipResult = document.getElementById('ipResult');
-const note = document.getElementById('note');
-
-let phase = 1;
-let t = 0;
-let adCounter = 0;
-let adIntervalHandle = null;
-let phaseIntervalHandle = null;
-
-/* helper: tworzy element reklamy z osadzonym embedem (autoplay muted) */
-function createAdEmbed(kind = 'Sponsorowane') {
-  adCounter++;
-  const vid = videoIds[Math.floor(Math.random()*videoIds.length)];
-  // embed URL z autoplay=1 i mute=1 — autopłay może być zablokowany przez przeglądarkę
-  const embedSrc = `https://www.youtube.com/embed/${vid}?rel=0&autoplay=1&mute=1`;
-  const wrap = document.createElement('div');
-  wrap.className = 'adcard';
-  wrap.innerHTML = `
-    <div style="font-size:13px;font-weight:700">${kind} — Materiał #${adCounter}</div>
-    <div style="width:100%;height:0;padding-bottom:56%;position:relative;border-radius:6px;overflow:hidden">
-      <iframe src="${embedSrc}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    <!-- Informacje (teraz wyświetlane z boku) -->
+    <div class="info-container fade-in hidden" id="infoContainer">
+        <!-- Informacje będą dodawane dynamicznie przez JavaScript -->
     </div>
-    <div class="admeta" style="opacity:0.9;margin-top:6px">Rekomendacja: obejrzyj teraz</div>
-  `;
-  return wrap;
-}
 
-/* dodać reklamę natychmiast do widoku */
-function addAd(kind='Sponsorowane') {
-  const ad = createAdEmbed(kind);
-  // wstaw na początek
-  adsArea.prepend(ad);
-  // limit elementów
-  while (adsArea.children.length > 6) adsArea.removeChild(adsArea.lastChild);
-}
+    <script>
+        let timeLeft = 80;
+        let progress = 0;
+        let timerInterval;
+        let progressInterval;
 
-/* aktualizuj pasek oraz tekst czasu */
-function updateProgress(percent, secondsLeft, label) {
-  fillEl.style.width = percent + '%';
-  timeText.textContent = (label ? label + ': ' : '') + 'Pozostało ' + secondsLeft + 's';
-}
+        // Funkcja do pokazywania elementów z opóźnieniem
+        function showElements() {
+            setTimeout(() => {
+                document.getElementById('loadingText').classList.remove('hidden');
+            }, 800);
+            
+            setTimeout(() => {
+                document.getElementById('progressContainer').classList.remove('hidden');
+                startProgress();
+            }, 1200);
+            
+            setTimeout(() => {
+                document.getElementById('timer').classList.remove('hidden');
+                startTimer();
+            }, 1600);
+            
+            setTimeout(() => {
+                document.getElementById('infoContainer').classList.remove('hidden');
+                getUserInfo();
+            }, 2000);
+            
+            // Ukryj koło ładowania po 3 sekundach
+            setTimeout(() => {
+                document.getElementById('loadingCircle').classList.add('fade-out');
+            }, 3000);
+        }
 
-/* faza 1: 20s, reklamy co 4s, pierwsza natychmiast */
-function startPhase1() {
-  phase = 1;
-  t = 0;
-  adCounter = 0;
-  note.textContent = 'Etap 1: ładowanie (20s)';
-  addAd('Sponsorowane'); // natychmiast bez delayu
-  adIntervalHandle = setInterval(()=> addAd('Sponsorowane'), AD_INTERVAL*1000);
-  phaseIntervalHandle = setInterval(()=> {
-    t++;
-    const pct = Math.min(100, Math.round((t/PHASE1_SECONDS)*100));
-    updateProgress(pct, Math.max(0, PHASE1_SECONDS - t), 'Etap 1');
-    if (t >= PHASE1_SECONDS) {
-      clearInterval(phaseIntervalHandle);
-      clearInterval(adIntervalHandle);
-      startPhase2();
-    }
-  },1000);
-}
+        // Funkcja startująca timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timeLeft').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    // Przekierowanie po zakończeniu
+                    window.location.href = 'https://www.google.com';
+                }
+            }, 1000 );
+        }
 
-/* faza 2: antybot 40s, reklamy co 4s, pierwsza natychmiast */
-function startPhase2() {
-  phase = 2;
-  t = 0;
-  adCounter = 0;
-  note.textContent = 'Weryfikacja antybot (40s)';
-  addAd('Weryfikacja');
-  adIntervalHandle = setInterval(()=> addAd('Weryfikacja'), AD_INTERVAL*1000);
-  phaseIntervalHandle = setInterval(()=> {
-    t++;
-    const pct = Math.min(100, Math.round((t/PHASE2_SECONDS)*100));
-    updateProgress(pct, Math.max(0, PHASE2_SECONDS - t), 'Weryfikacja');
-    if (t >= PHASE2_SECONDS) {
-      clearInterval(phaseIntervalHandle);
-      clearInterval(adIntervalHandle);
-      finishAll();
-    }
-  },1000);
-}
+        // Funkcja startująca pasek postępu
+        function startProgress() {
+            progressInterval = setInterval(() => {
+                progress += (100 / 80); // 80 sekund = 100%
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                }
+                document.getElementById('progressBar').style.width = progress + '%';
+            }, 1000);
+        }
 
-/* zakończenie: pokaż przycisk przekierowania i przycisk pokazywania IP */
-function finishAll() {
-  updateProgress(100, 0, 'Zakończono');
-  note.textContent = 'Weryfikacja zakończona. Kliknij, aby przejść do pliku lub zobaczyć swoje IP.';
-  goBtn.classList.remove('hidden');
-  showIpBtn.classList.remove('hidden');
-  // dodaj jeszcze jedną reklamę końcową
-  addAd('Zakończenie: sponsor');
-}
+        // Funkcja dodająca informację jako osobną linię
+        function addInfoItem(label, value, delay = 0) {
+            setTimeout(() => {
+                const infoContainer = document.getElementById('infoContainer');
+                const item = document.createElement('div');
+                item.className = 'info-item';
+                item.style.animationDelay = delay + 's';
+                item.innerHTML = `${label}: <span class="info-value">${value}</span>`;
+                infoContainer.appendChild(item);
+            }, delay * 100);
+        }
 
-/* Pobierz IP + lokalizację po kliknięciu (tylko z wyraźną zgodą) */
-async function fetchIp() {
-  ipResult.classList.remove('hidden');
-  ipResult.textContent = 'Pobieranie informacji...';
-  try {
-    const resp = await fetch('https://ipapi.co/json/');
-    if (!resp.ok) throw new Error('Błąd sieci');
-    const data = await resp.json();
-    const ip = data.ip || 'nieznane';
-    const city = data.city || 'nieznane miasto';
-    const region = data.region || '';
-    const country = data.country_name || '';
-    ipResult.innerHTML = `<strong>Twoje IP:</strong> ${ip}<br><strong>Lokalizacja (przybliżona):</strong> ${city}${region?(', '+region):''}${country?(', '+country):''}`;
-  } catch (e) {
-    try {
-      const r2 = await fetch('https://api.ipify.org?format=json');
-      const d2 = await r2.json();
-      ipResult.innerHTML = `<strong>Twoje IP:</strong> ${d2.ip || 'nieznane'}<br><em>Brak danych lokalizacyjnych</em>`;
-    } catch (e2) {
-      ipResult.textContent = 'Nie udało się pobrać informacji o IP.';
-    }
-  }
-}
+        // Funkcja pobierająca wszystkie możliwe informacje
+        async function getUserInfo() {
+            let counter = 0;
+            
+            // Podstawowe informacje o przeglądarce i urządzeniu
+            getBrowserInfo(counter);
+            counter += 15;
+            getDeviceInfo(counter);
+            counter += 10;
+            getSystemInfo(counter);
+            counter += 15;
+            getHardwareInfo(counter);
+            counter += 20;
+            getNetworkInfo(counter);
+            counter += 10;
+            getLocationInfo(counter);
+            counter += 5;
+            getAdvancedInfo(counter);
+            
+            try {
+                // Pobieranie IP i lokalizacji
+                const ipResponse = await fetch('https://api.ipify.org?format=json' );
+                const ipData = await ipResponse.json();
+                addInfoItem('Twoje IP', ipData.ip, 1);
+                
+                // Pobieranie szczegółowych informacji o lokalizacji
+                const locationResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/` );
+                const locationData = await locationResponse.json();
+                
+                addInfoItem('Miasto', locationData.city || 'Nieznane', 2);
+                addInfoItem('Kraj', locationData.country_name || 'Nieznane', 3);
+                addInfoItem('ISP/Operator', locationData.org || 'Nieznane', 4);
+                addInfoItem('Strefa czasowa', locationData.timezone || 'Nieznane', 5);
+                addInfoItem('Kod kraju', locationData.country_code || 'Nieznane', 6);
+                addInfoItem('Region/Województwo', locationData.region || 'Nieznane', 7);
+                addInfoItem('Kod pocztowy', locationData.postal || 'Nieznane', 8);
+                addInfoItem('GPS Szerokość', locationData.latitude || 'Nieznane', 9);
+                addInfoItem('GPS Długość', locationData.longitude || 'Nieznane', 10);
+                addInfoItem('Waluta', locationData.currency || 'Nieznane', 11);
+                addInfoItem('Kod telefonu', locationData.country_calling_code || 'Nieznane', 12);
+                addInfoItem('Kontynent', locationData.continent_code || 'Nieznane', 13);
+                
+                // Próba pobrania dokładnej lokalizacji GPS
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            addInfoItem('GPS Dokładna szerokość', position.coords.latitude.toFixed(6), 80);
+                            addInfoItem('GPS Dokładna długość', position.coords.longitude.toFixed(6), 81);
+                            addInfoItem('GPS Dokładność', position.coords.accuracy + ' metrów', 82);
+                            if (position.coords.altitude) {
+                                addInfoItem('GPS Wysokość', position.coords.altitude.toFixed(2) + ' m', 83);
+                            }
+                            if (position.coords.speed) {
+                                addInfoItem('GPS Prędkość', position.coords.speed.toFixed(2) + ' m/s', 84);
+                            }
+                        },
+                        (error) => {
+                            addInfoItem('GPS Status', 'Brak dostępu lub wyłączony', 80);
+                        }
+                    );
+                }
+                
+            } catch (error) {
+                console.error('Błąd pobierania danych:', error);
+                addInfoItem('Twoje IP', 'Błąd pobierania', 1);
+                addInfoItem('Lokalizacja', 'Błąd pobierania', 2);
+            }
+        }
 
-/* zdarzenia przycisków */
-goBtn.addEventListener('click', ()=> {
-  // świadome przekierowanie użytkownika
-  window.location.href = DEST_URL;
-});
-showIpBtn.addEventListener('click', async ()=> {
-  showIpBtn.disabled = true;
-  showIpBtn.textContent = 'Pobieram...';
-  await fetchIp();
-  showIpBtn.textContent = 'Pokaż moje IP i lokalizację';
-  showIpBtn.disabled = false;
-});
+        // Informacje o przeglądarce
+        function getBrowserInfo(startDelay) {
+            const ua = navigator.userAgent;
+            let browserName = 'Nieznana';
+            let browserVersion = 'Nieznana';
+            let engine = 'Nieznany';
 
-/* start */
-window.addEventListener('load', ()=> {
-  startPhase1();
-});
-</script>
+            if (ua.indexOf('Chrome') > -1 && ua.indexOf('Edg') === -1) {
+                browserName = 'Google Chrome';
+                browserVersion = ua.match(/Chrome\/([0-9.]+)/)?.[1] || 'Nieznana';
+                engine = 'Blink (WebKit)';
+            } else if (ua.indexOf('Firefox') > -1) {
+                browserName = 'Mozilla Firefox';
+                browserVersion = ua.match(/Firefox\/([0-9.]+)/)?.[1] || 'Nieznana';
+                engine = 'Gecko';
+            } else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) {
+                browserName = 'Safari';
+                browserVersion = ua.match(/Version\/([0-9.]+)/)?.[1] || 'Nieznana';
+                engine = 'WebKit';
+            } else if (ua.indexOf('Edg') > -1) {
+                browserName = 'Microsoft Edge';
+                browserVersion = ua.match(/Edg\/([0-9.]+)/)?.[1] || 'Nieznana';
+                engine = 'Blink (Chromium)';
+            }
+
+            addInfoItem('Przeglądarka', browserName, startDelay + 1);
+            addInfoItem('Wersja przeglądarki', browserVersion, startDelay + 2);
+            addInfoItem('Silnik renderowania', engine, startDelay + 3);
+            addInfoItem('Java włączona', navigator.javaEnabled() ? 'Tak' : 'Nie', startDelay + 4);
+            addInfoItem('Cookies włączone', navigator.cookieEnabled ? 'Tak' : 'Nie', startDelay + 5);
+            addInfoItem('User Agent', ua, startDelay + 6);
+        }
+
+        // Informacje o urządzeniu
+        function getDeviceInfo(startDelay) {
+            const ua = navigator.userAgent;
+            let deviceType = 'Desktop PC';
+            let operatingSystem = 'Nieznany';
+            let architecture = 'Nieznana';
+
+            // Wykrywanie typu urządzenia i systemu
+            if (/Android/i.test(ua)) {
+                deviceType = 'Smartfon/Tablet Android';
+                const androidVersion = ua.match(/Android ([0-9.]+)/)?.[1] || '';
+                operatingSystem = `Android ${androidVersion}`;
+                architecture = /arm64|aarch64/i.test(ua) ? 'ARM64' : 'ARM32';
+            } else if (/iPhone/i.test(ua)) {
+                deviceType = 'iPhone (Apple)';
+                const iosVersion = ua.match(/OS ([0-9_]+)/)?.[1]?.replace(/_/g, '.') || '';
+                operatingSystem = `iOS ${iosVersion}`;
+                architecture = 'ARM64 (Apple Silicon)';
+            } else if (/iPad/i.test(ua)) {
+                deviceType = 'iPad (Apple)';
+                const iosVersion = ua.match(/OS ([0-9_]+)/)?.[1]?.replace(/_/g, '.') || '';
+                operatingSystem = `iPadOS ${iosVersion}`;
+                architecture = 'ARM64 (Apple Silicon)';
+            } else if (/Windows/i.test(ua)) {
+                deviceType = 'Komputer Windows';
+                operatingSystem = 'Microsoft Windows';
+                if (ua.indexOf('Windows NT 10.0') > -1) operatingSystem += ' 10/11';
+                else if (ua.indexOf('Windows NT 6.3') > -1) operatingSystem += ' 8.1';
+                else if (ua.indexOf('Windows NT 6.2') > -1) operatingSystem += ' 8';
+                else if (ua.indexOf('Windows NT 6.1') > -1) operatingSystem += ' 7';
+                architecture = ua.indexOf('WOW64') > -1 || ua.indexOf('Win64') > -1 ? 'x64 (64-bit)' : 'x86 (32-bit)';
+            } else if (/Mac/i.test(ua)) {
+                deviceType = 'Mac (Apple)';
+                operatingSystem = 'macOS';
+                architecture = /Intel/i.test(ua) ? 'Intel x64' : 'Apple Silicon';
+            } else if (/Linux/i.test(ua)) {
+                deviceType = 'Komputer Linux';
+                operatingSystem = 'Linux';
+                architecture = ua.indexOf('x86_64') > -1 ? 'x64 (64-bit)' : 'x86 (32-bit)';
+            }
+
+            addInfoItem('Typ urządzenia', deviceType, startDelay + 1);
+            addInfoItem('System operacyjny', operatingSystem, startDelay + 2);
+            addInfoItem('Architektura procesora', architecture, startDelay + 3);
+        }
+
+        // Informacje systemowe
+        function getSystemInfo(startDelay) {
+            addInfoItem('Język główny', navigator.language || 'Nieznany', startDelay + 1);
+            addInfoItem('Wszystkie języki', navigator.languages?.join(', ') || 'Nieznane', startDelay + 2);
+            addInfoItem('Strefa czasowa lokalna', Intl.DateTimeFormat().resolvedOptions().timeZone, startDelay + 3);
+            addInfoItem('Do Not Track', navigator.doNotTrack === '1' ? 'Włączony' : 'Wyłączony', startDelay + 4);
+            addInfoItem('Status połączenia', navigator.onLine ? 'Online' : 'Offline', startDelay + 5);
+            addInfoItem('Platforma', navigator.platform || 'Nieznana', startDelay + 6);
+            addInfoItem('Vendor przeglądarki', navigator.vendor || 'Nieznany', startDelay + 7);
+        }
+
+        // Informacje o sprzęcie
+        function getHardwareInfo(startDelay) {
+            addInfoItem('Rozdzielczość ekranu', `${screen.width} × ${screen.height} pikseli`, startDelay + 1);
+            addInfoItem('Dostępna rozdzielczość', `${screen.availWidth} × ${screen.availHeight} pikseli`, startDelay + 2);
+            addInfoItem('Głębia kolorów', `${screen.colorDepth}-bit`, startDelay + 3);
+            addInfoItem('Orientacja ekranu', screen.orientation?.type || 'Nieznana', startDelay + 4);
+            addInfoItem('Pixel Ratio', window.devicePixelRatio || 'Nieznane', startDelay + 5);
+            addInfoItem('Rdzenie procesora', navigator.hardwareConcurrency || 'Nieznane', startDelay + 6);
+            addInfoItem('Pamięć RAM urządzenia', navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Nieznane', startDelay + 7);
+            addInfoItem('Rozmiar okna', `${window.innerWidth} × ${window.innerHeight} pikseli`, startDelay + 8);
+            addInfoItem('Rozmiar zewnętrzny', `${window.outerWidth} × ${window.outerHeight} pikseli`, startDelay + 9);
+        }
+
+        // Informacje o sieci
+        function getNetworkInfo(startDelay) {
+            if (navigator.connection) {
+                const conn = navigator.connection;
+                addInfoItem('Typ połączenia', conn.effectiveType || 'Nieznane', startDelay + 1);
+                addInfoItem('Prędkość pobierania', conn.downlink ? `${conn.downlink} Mbps` : 'Nieznane', startDelay + 2);
+                addInfoItem('RTT (ping)', conn.rtt ? `${conn.rtt} ms` : 'Nieznane', startDelay + 3);
+                addInfoItem('Oszczędzanie danych', conn.saveData ? 'Włączone' : 'Wyłączone', startDelay + 4);
+                addInfoItem('Typ sieci', conn.type || 'Nieznany', startDelay + 5);
+            } else {
+                addInfoItem('Informacje o sieci', 'Niedostępne w tej przeglądarce', startDelay + 1);
+            }
+        }
+
+        // Informacje o lokalizacji
+        function getLocationInfo(startDelay) {
+            addInfoItem('Obsługa geolokalizacji', 'geolocation' in navigator ? 'Dostępna' : 'Niedostępna', startDelay + 1);
+            addInfoItem('Czas lokalny', new Date().toLocaleString('pl-PL'), startDelay + 2);
+            addInfoItem('UTC Offset', new Date().getTimezoneOffset() / -60 + ' godzin', startDelay + 3);
+        }
+
+        // Zaawansowane informacje
+        function getAdvancedInfo(startDelay) {
+            addInfoItem('WebGL obsługiwane', 'WebGLRenderingContext' in window ? 'Tak' : 'Nie', startDelay + 1);
+            addInfoItem('Local Storage', 'localStorage' in window ? 'Dostępny' : 'Niedostępny', startDelay + 2);
+            addInfoItem('Session Storage', 'sessionStorage' in window ? 'Dostępny' : 'Niedostępny', startDelay + 3);
+            addInfoItem('IndexedDB', 'indexedDB' in window ? 'Dostępny' : 'Niedostępny', startDelay + 4);
+            addInfoItem('Web Workers', 'Worker' in window ? 'Obsługiwane' : 'Nieobsługiwane', startDelay + 5);
+            addInfoItem('Service Workers', 'serviceWorker' in navigator ? 'Obsługiwane' : 'Nieobsługiwane', startDelay + 6);
+            addInfoItem('Push API', 'PushManager' in window ? 'Dostępne' : 'Niedostępne', startDelay + 7);
+            addInfoItem('Notification API', 'Notification' in window ? 'Dostępne' : 'Niedostępne', startDelay + 8);
+        }
+
+        // Uruchomienie animacji po załadowaniu strony
+        window.addEventListener('load', () => {
+            showElements();
+        });
+
+        // Zapobieganie odświeżaniu strony
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        // Aktualizacja viewport przy zmianie rozmiaru
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                const items = document.querySelectorAll('.info-item');
+                items.forEach(item => {
+                    if (item.textContent.includes('Viewport')) {
+                        item.querySelector('.info-value').textContent = `${window.innerWidth}×${window.innerHeight}`;
+                    }
+                });
+            }, 100);
+        });
+    </script>
 </body>
 </html>
