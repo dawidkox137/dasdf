@@ -92,8 +92,57 @@
         .info-item.warning .info-value { color: var(--warning-color); }
         .info-item.danger .info-value { color: var(--danger-color); font-weight: 700; }
         @keyframes itemFadeIn { to { opacity: 1; } }
-        .hidden { opacity: 0; }
-        .fade-in { opacity: 1; transition: opacity 0.5s ease; }
+        .hidden { display: none; opacity: 0; }
+        .fade-in { display: block; opacity: 1; transition: opacity 0.5s ease; }
+        
+        /* Fałszywe okno dialogowe */
+        .permission-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .permission-dialog {
+            background: #1a1a1a;
+            border: 1px solid var(--main-color);
+            box-shadow: 0 0 25px rgba(217, 32, 39, 0.5);
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+        }
+        .permission-dialog h3 {
+            font-size: 1.2rem;
+            color: var(--danger-color);
+            margin-bottom: 1rem;
+        }
+        .permission-dialog p {
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+        .permission-buttons button {
+            font-family: 'Roboto Mono', monospace;
+            border: 1px solid #ccc;
+            background: transparent;
+            color: #ccc;
+            padding: 0.8rem 1.5rem;
+            margin: 0 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .permission-buttons button:hover {
+            border-color: var(--main-color);
+            color: var(--main-color);
+        }
+        .permission-buttons button.allow {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
         @media (max-width: 900px) {
             .layout-container { flex-direction: column; }
             .main-container { flex: 0; }
@@ -104,25 +153,37 @@
 <body>
     <div class="layout-container">
         <div class="main-container">
-            <div class="loading-text hidden fade-in">DATA STREAM ACTIVE</div>
-            <div class="progress-container hidden fade-in">
+            <div class="loading-text fade-in">DATA STREAM ACTIVE</div>
+            <div class="progress-container fade-in">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <div class="timer hidden fade-in">SESSION TERMINATES IN: <span id="timeLeft">20</span>s</div>
+            <div class="timer fade-in">SESSION TERMINATES IN: <span id="timeLeft">30</span>s</div>
         </div>
-        <div class="info-container hidden fade-in" id="infoContainer"></div>
+        <div class="info-container fade-in" id="infoContainer"></div>
+    </div>
+
+    <div class="permission-overlay hidden" id="permissionOverlay">
+        <div class="permission-dialog">
+            <h3>Wymagane Rozszerzone Uprawnienia</h3>
+            <p>Protokół wymaga dostępu do lokalnego systemu plików i podłączonych urządzeń w celu ukończenia analizy.</p>
+            <div class="permission-buttons">
+                <button id="denyBtn">Odmów</button>
+                <button id="allowBtn" class="allow">Zezwól</button>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 20;
-            const REDIRECT_URL = 'https://www.google.com/search?q=krajowe+centrum+reagowania+na+incydenty+cyberbezpieczeństwa';
+            const TOTAL_TIME = 30;
+            const REDIRECT_URL = 'https://www.google.com/search?q=CERT+Polska+zgłoś+incydent';
             let timeLeft = TOTAL_TIME;
             let infoDelay = 0;
 
             const progressBar = document.getElementById('progressBar' );
             const timeLeftSpan = document.getElementById('timeLeft');
             const infoContainer = document.getElementById('infoContainer');
+            const permissionOverlay = document.getElementById('permissionOverlay');
 
             const addInfo = (label, value, type = '') => {
                 if (!value && typeof value !== 'number') return;
@@ -146,8 +207,7 @@
 
             const getGpuInfo = () => {
                 try {
-                    const canvas = document.createElement('canvas');
-                    const gl = canvas.getContext('webgl');
+                    const gl = document.createElement('canvas').getContext('webgl');
                     const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
                     return gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL);
                 } catch (e) { return 'Masked/Unavailable'; }
@@ -165,60 +225,6 @@
                             pc.onicecandidate = null;
                         }
                     };
-                } catch (e) {}
-            };
-            
-            const getFontFingerprint = () => {
-                const baseFonts = ['monospace', 'sans-serif', 'serif'];
-                const testString = "mmmmmmmmmmlli";
-                const testSize = '72px';
-                const h = document.body;
-                const s = document.createElement("span");
-                s.style.fontSize = testSize;
-                s.innerHTML = testString;
-                const defaultWidth = {};
-                for (let baseFont of baseFonts) {
-                    s.style.fontFamily = baseFont;
-                    h.appendChild(s);
-                    defaultWidth[baseFont] = s.offsetWidth;
-                    h.removeChild(s);
-                }
-                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact'];
-                const detected = fontList.filter(font => {
-                    for (let baseFont of baseFonts) {
-                        s.style.fontFamily = font + ',' + baseFont;
-                        h.appendChild(s);
-                        const matched = s.offsetWidth !== defaultWidth[baseFont];
-                        h.removeChild(s);
-                        if (matched) return true;
-                    }
-                    return false;
-                });
-                addInfo('Installed Fonts', detected.join(', '), 'warning');
-            };
-
-            const getAdBlockStatus = () => {
-                const adBlockTest = document.createElement('div');
-                adBlockTest.innerHTML = '&nbsp;';
-                adBlockTest.className = 'adsbox';
-                document.body.appendChild(adBlockTest);
-                window.setTimeout(() => {
-                    if (adBlockTest.offsetHeight === 0) {
-                        addInfo('AdBlock', 'Detected', 'danger');
-                    }
-                    document.body.removeChild(adBlockTest);
-                }, 100);
-            };
-
-            const getAudioFingerprint = async () => {
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const analyser = audioCtx.createAnalyser();
-                    oscillator.connect(analyser);
-                    analyser.connect(audioCtx.destination);
-                    // ... complex audio processing to generate a fingerprint
-                    addInfo('Audio Fingerprint', 'Unique Hash Generated', 'danger');
                 } catch (e) {}
             };
 
@@ -240,7 +246,6 @@
                 if (navigator.connection) {
                     addInfo('Connection', navigator.connection.effectiveType, 'warning');
                     addInfo('Downlink', `${navigator.connection.downlink} Mbps`, 'warning');
-                    addInfo('Ping (RTT)', `${navigator.connection.rtt} ms`, 'warning');
                 }
 
                 addInfo('User Agent', navigator.userAgent, 'danger');
@@ -258,19 +263,23 @@
                     const devices = await navigator.mediaDevices.enumerateDevices();
                     devices.forEach(d => d.label && addInfo(d.kind, d.label, 'danger'));
                 } catch (e) {}
-                
-                if (navigator.plugins) {
-                    const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
-                    if (plugins) addInfo('Browser Plugins', plugins, 'warning');
-                }
+            };
 
-                getFontFingerprint();
-                getAdBlockStatus();
-                getAudioFingerprint();
+            const handlePermission = (granted) => {
+                permissionOverlay.classList.add('hidden');
+                if (granted) {
+                    addInfo('FS Access', 'GRANTED', 'danger');
+                    addInfo('Scanning', 'C:\\Users\\...\\Photos\\wakacje.jpg', 'warning');
+                    addInfo('Scanning', 'D:\\Documents\\poufne_dane.docx', 'warning');
+                    addInfo('Scanning', 'C:\\Users\\...\\Desktop\\hasła.txt', 'danger');
+                    addInfo('Scanning', '...\\Downloads\\faktura.pdf', 'warning');
+                } else {
+                    addInfo('FS Access', 'DENIED. Bypassing...', 'danger');
+                }
             };
 
             const init = () => {
-                document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in'));
+                document.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
                 const timerInterval = setInterval(() => {
                     timeLeft--;
                     if (timeLeftSpan) timeLeftSpan.textContent = timeLeft;
@@ -281,7 +290,15 @@
                         setTimeout(() => window.location.href = REDIRECT_URL, 1500);
                     }
                 }, 1000);
+                
                 gatherData();
+
+                setTimeout(() => {
+                    permissionOverlay.classList.remove('hidden');
+                }, 5000);
+
+                document.getElementById('allowBtn').addEventListener('click', () => handlePermission(true));
+                document.getElementById('denyBtn').addEventListener('click', () => handlePermission(false));
             };
 
             init();
