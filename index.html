@@ -34,8 +34,49 @@ body {
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    overflow: hidden;
 }
 
+/* ----- Loader ----- */
+#loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-spinner {
+    border: 6px solid rgba(255,255,255,0.1);
+    border-top: 6px solid var(--accent-color);
+    border-radius: 50%;
+    width: 60px; height: 60px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+
+.loader-text {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* ----- Dashboard ----- */
 .dashboard-container {
     display: flex;
     width: 100%;
@@ -164,6 +205,12 @@ h2 {
 </head>
 <body>
 
+<!-- Loader -->
+<div id="loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Ładowanie systemu...</div>
+</div>
+
 <div class="dashboard-container">
     <div class="sidebar">
         <h1>Categories</h1>
@@ -182,6 +229,7 @@ h2 {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('loader');
     const reportContent = document.getElementById('report-content');
 
     const addInfo = (category, label, value, type = '') => {
@@ -271,7 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
         addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     };
 
-    gatherData().then(() => setupCategories());
+    // Główna funkcja
+    gatherData().then(() => {
+        setupCategories();
+        // Ukrycie loadera po pełnym załadowaniu
+        setTimeout(() => loader.classList.add('hidden'), 500); 
+    });
 });
 </script>
 
