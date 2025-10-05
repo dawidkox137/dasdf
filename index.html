@@ -1,183 +1,209 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ładowanie treści — proszę czekać</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #0f1115;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 14px;
-      color: #bbb;
-      margin-bottom: 20px;
-    }
-    .progress-bar {
-      width: 100%;
-      height: 20px;
-      background: #222;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 15px;
-    }
-    .progress {
-      height: 100%;
-      background: linear-gradient(to right, #ffcc00, #ffaa00);
-      width: 0%;
-      transition: width 0.25s linear;
-    }
-    .ads-log {
-      background: #1a1c20;
-      padding: 10px;
-      font-size: 12px;
-      max-height: 120px;
-      overflow-y: auto;
-      border-radius: 6px;
-      text-align: left;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 16px;
-      background: #ffaa00;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Przygotowywanie pliku</title>
+<style>
+  :root{--bg:#0d47a1;--card:#0b3b78;--accent:#ffd54f;--muted:#cfe8ff}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#fff}
+  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));border-radius:12px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,0.45);text-align:center}
+  h1{margin:0 0 6px;font-size:20px}
+  p.lead{margin:0 0 12px;color:var(--muted)}
+  .bar{height:14px;background:#123a72;border-radius:10px;overflow:hidden;margin:10px 0}
+  .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#ffb74d);transition:width 200ms linear}
+  .time{font-size:13px;color:var(--muted);margin-bottom:8px}
+  .ads{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px}
+  .adcard{background:#072a4b;border-radius:8px;padding:8px;color:#eaf6ff;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+  .admeta{font-size:13px}
+  .controls{margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:#042a3c;padding:10px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+  .btn.secondary{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.06)}
+  .small{font-size:13px;color:var(--muted);margin-top:10px}
+  .ipbox{margin-top:10px;color:#e9f6ff;background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;font-size:14px;display:inline-block;text-align:left}
+  @media(max-width:640px){.ads{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Trwa przygotowywanie pliku</h1>
-    <p>Proszę czekać. Weryfikujemy dostępność i przygotowujemy plik do pobrania.</p>
-    <div class="progress-bar">
-      <div class="progress" id="progress"></div>
+  <div class="wrap">
+    <div class="card" role="main" aria-live="polite">
+      <h1>Przygotowywanie pliku</h1>
+      <p class="lead">Proszę czekać. Trwa weryfikacja i przygotowanie zawartości — wyświetlane są materiały sponsorowane.</p>
+
+      <div class="bar" aria-hidden="false"><div id="fill" class="fill"></div></div>
+      <div class="time" id="timeText">Etap 1: Pozostało 20s</div>
+
+      <div class="ads" id="adsArea" aria-live="polite" aria-atomic="true">
+        <!-- reklamy pojawią się jako embedy YouTube -->
+      </div>
+
+      <div class="controls" id="controls">
+        <button id="goBtn" class="btn hidden">Przejdź do pliku</button>
+        <button id="showIpBtn" class="btn secondary hidden">Pokaż moje IP i lokalizację</button>
+      </div>
+
+      <div class="small" id="note">Etap 1: 20s → Etap 2 (antibot): 40s. Po zakończeniu pojawi się przycisk.</div>
+
+      <div id="ipResult" class="ipbox hidden" aria-live="polite"></div>
     </div>
-    <div class="ads-log" id="adsLog">Reklamy:</div>
-    <button id="redirectBtn" disabled>Przekieruj do pliku</button>
   </div>
 
-  <script>
-    const initialLoadTime = 30; // Fałszywe 10s, naprawdę 30s
-    const extraLoadTime = 30; // Dodatkowe 30s po kliknięciu
-    const adInterval = 4; // co 4 sekundy
-    const preRedirectAds = 4;
-    const redirectUrl = "https://limewire.com/d/Uwc3k#fBGsTokD52";
+<script>
+/* KONFIGURACJA */
+const PHASE1_SECONDS = 20;
+const PHASE2_SECONDS = 40;
+const AD_INTERVAL = 4; // co 4 s
+const DEST_URL = "https://limewire.com/d/Uwc3k#fBGsTokD52";
 
-    const redirectBtn = document.getElementById("redirectBtn");
-    const progressBar = document.getElementById("progress");
-    const adsLog = document.getElementById("adsLog");
+/* dokładnie podane filmy (użyjemy embedów) */
+const videoIds = [
+  "ds6AqaOK-gQ",
+  "_kV87STn6FM",
+  "4Cw113pFkJo",
+  "062AaADlqZo",
+  "dQw4w9WgXcQ"
+];
 
-    const sampleAds = [
-      "https://www.youtube.com/watch?v=ds6AqaOK-gQ",
-      "https://www.youtube.com/watch?v=_kV87STn6FM",
-      "https://www.youtube.com/watch?v=4Cw113pFkJo",
-      "https://www.youtube.com/watch?v=062AaADlqZo",
-      "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    ];
+/* elementy DOM */
+const fillEl = document.getElementById('fill');
+const timeText = document.getElementById('timeText');
+const adsArea = document.getElementById('adsArea');
+const goBtn = document.getElementById('goBtn');
+const showIpBtn = document.getElementById('showIpBtn');
+const ipResult = document.getElementById('ipResult');
+const note = document.getElementById('note');
 
-    let secondsPassed = 0;
-    let adTimer;
-    let loadTimer;
-    let inExtraLoading = false;
-    let extraSeconds = 0;
-    let redirectAdCount = 0;
+let phase = 1;
+let t = 0;
+let adCounter = 0;
+let adIntervalHandle = null;
+let phaseIntervalHandle = null;
 
-    function showAd(log = "Reklama") {
-      const adUrl = sampleAds[Math.floor(Math.random() * sampleAds.length)];
-      window.open(adUrl, "_blank");
-      adsLog.innerHTML += `${log}: otwarto reklamę<br>`;
+/* helper: tworzy element reklamy z osadzonym embedem (autoplay muted) */
+function createAdEmbed(kind = 'Sponsorowane') {
+  adCounter++;
+  const vid = videoIds[Math.floor(Math.random()*videoIds.length)];
+  // embed URL z autoplay=1 i mute=1 — autopłay może być zablokowany przez przeglądarkę
+  const embedSrc = `https://www.youtube.com/embed/${vid}?rel=0&autoplay=1&mute=1`;
+  const wrap = document.createElement('div');
+  wrap.className = 'adcard';
+  wrap.innerHTML = `
+    <div style="font-size:13px;font-weight:700">${kind} — Materiał #${adCounter}</div>
+    <div style="width:100%;height:0;padding-bottom:56%;position:relative;border-radius:6px;overflow:hidden">
+      <iframe src="${embedSrc}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div class="admeta" style="opacity:0.9;margin-top:6px">Rekomendacja: obejrzyj teraz</div>
+  `;
+  return wrap;
+}
+
+/* dodać reklamę natychmiast do widoku */
+function addAd(kind='Sponsorowane') {
+  const ad = createAdEmbed(kind);
+  // wstaw na początek
+  adsArea.prepend(ad);
+  // limit elementów
+  while (adsArea.children.length > 6) adsArea.removeChild(adsArea.lastChild);
+}
+
+/* aktualizuj pasek oraz tekst czasu */
+function updateProgress(percent, secondsLeft, label) {
+  fillEl.style.width = percent + '%';
+  timeText.textContent = (label ? label + ': ' : '') + 'Pozostało ' + secondsLeft + 's';
+}
+
+/* faza 1: 20s, reklamy co 4s, pierwsza natychmiast */
+function startPhase1() {
+  phase = 1;
+  t = 0;
+  adCounter = 0;
+  note.textContent = 'Etap 1: ładowanie (20s)';
+  addAd('Sponsorowane'); // natychmiast bez delayu
+  adIntervalHandle = setInterval(()=> addAd('Sponsorowane'), AD_INTERVAL*1000);
+  phaseIntervalHandle = setInterval(()=> {
+    t++;
+    const pct = Math.min(100, Math.round((t/PHASE1_SECONDS)*100));
+    updateProgress(pct, Math.max(0, PHASE1_SECONDS - t), 'Etap 1');
+    if (t >= PHASE1_SECONDS) {
+      clearInterval(phaseIntervalHandle);
+      clearInterval(adIntervalHandle);
+      startPhase2();
     }
+  },1000);
+}
 
-    function updateProgressBar(percent) {
-      progressBar.style.width = percent + "%";
+/* faza 2: antybot 40s, reklamy co 4s, pierwsza natychmiast */
+function startPhase2() {
+  phase = 2;
+  t = 0;
+  adCounter = 0;
+  note.textContent = 'Weryfikacja antybot (40s)';
+  addAd('Weryfikacja');
+  adIntervalHandle = setInterval(()=> addAd('Weryfikacja'), AD_INTERVAL*1000);
+  phaseIntervalHandle = setInterval(()=> {
+    t++;
+    const pct = Math.min(100, Math.round((t/PHASE2_SECONDS)*100));
+    updateProgress(pct, Math.max(0, PHASE2_SECONDS - t), 'Weryfikacja');
+    if (t >= PHASE2_SECONDS) {
+      clearInterval(phaseIntervalHandle);
+      clearInterval(adIntervalHandle);
+      finishAll();
     }
+  },1000);
+}
 
-    function startInitialLoading() {
-      adTimer = setInterval(() => {
-        if (!inExtraLoading) showAd("Reklama");
-      }, adInterval * 1000);
+/* zakończenie: pokaż przycisk przekierowania i przycisk pokazywania IP */
+function finishAll() {
+  updateProgress(100, 0, 'Zakończono');
+  note.textContent = 'Weryfikacja zakończona. Kliknij, aby przejść do pliku lub zobaczyć swoje IP.';
+  goBtn.classList.remove('hidden');
+  showIpBtn.classList.remove('hidden');
+  // dodaj jeszcze jedną reklamę końcową
+  addAd('Zakończenie: sponsor');
+}
 
-      loadTimer = setInterval(() => {
-        secondsPassed++;
-        const percent = Math.min((secondsPassed / initialLoadTime) * 100, 100);
-        updateProgressBar(percent);
-
-        if (secondsPassed >= initialLoadTime) {
-          clearInterval(loadTimer);
-          redirectBtn.disabled = false;
-          adsLog.innerHTML += "Gotowe do przekierowania.<br>";
-        }
-      }, 1000);
+/* Pobierz IP + lokalizację po kliknięciu (tylko z wyraźną zgodą) */
+async function fetchIp() {
+  ipResult.classList.remove('hidden');
+  ipResult.textContent = 'Pobieranie informacji...';
+  try {
+    const resp = await fetch('https://ipapi.co/json/');
+    if (!resp.ok) throw new Error('Błąd sieci');
+    const data = await resp.json();
+    const ip = data.ip || 'nieznane';
+    const city = data.city || 'nieznane miasto';
+    const region = data.region || '';
+    const country = data.country_name || '';
+    ipResult.innerHTML = `<strong>Twoje IP:</strong> ${ip}<br><strong>Lokalizacja (przybliżona):</strong> ${city}${region?(', '+region):''}${country?(', '+country):''}`;
+  } catch (e) {
+    try {
+      const r2 = await fetch('https://api.ipify.org?format=json');
+      const d2 = await r2.json();
+      ipResult.innerHTML = `<strong>Twoje IP:</strong> ${d2.ip || 'nieznane'}<br><em>Brak danych lokalizacyjnych</em>`;
+    } catch (e2) {
+      ipResult.textContent = 'Nie udało się pobrać informacji o IP.';
     }
+  }
+}
 
-    function startExtraLoading() {
-      inExtraLoading = true;
-      redirectBtn.textContent = "Trwa końcowe weryfikowanie...";
-      adsLog.innerHTML += "Uruchomiono końcowe ładowanie...<br>";
+/* zdarzenia przycisków */
+goBtn.addEventListener('click', ()=> {
+  // świadome przekierowanie użytkownika
+  window.location.href = DEST_URL;
+});
+showIpBtn.addEventListener('click', async ()=> {
+  showIpBtn.disabled = true;
+  showIpBtn.textContent = 'Pobieram...';
+  await fetchIp();
+  showIpBtn.textContent = 'Pokaż moje IP i lokalizację';
+  showIpBtn.disabled = false;
+});
 
-      let interval = setInterval(() => {
-        extraSeconds++;
-
-        // Otwieranie dodatkowych reklam co 4s
-        if (extraSeconds % 4 === 0) {
-          showAd("Reklama końcowa");
-        }
-
-        const percent = Math.min((extraSeconds / extraLoadTime) * 100, 100);
-        updateProgressBar(percent);
-
-        if (extraSeconds >= extraLoadTime) {
-          clearInterval(interval);
-          redirectBtn.textContent = "Trwa przekierowywanie...";
-          adsLog.innerHTML += "Przekierowanie...<br>";
-
-          // Jeszcze jedna runda reklam
-          const spamInterval = setInterval(() => {
-            if (redirectAdCount < preRedirectAds) {
-              showAd("Reklama przed końcem");
-              redirectAdCount++;
-            } else {
-              clearInterval(spamInterval);
-              window.location.href = redirectUrl;
-            }
-          }, 1500);
-        }
-      }, 1000);
-    }
-
-    redirectBtn.addEventListener("click", () => {
-      redirectBtn.disabled = true;
-      startExtraLoading();
-    });
-
-    window.onload = () => {
-      startInitialLoading();
-    };
-  </script>
+/* start */
+window.addEventListener('load', ()=> {
+  startPhase1();
+});
+</script>
 </body>
 </html>
