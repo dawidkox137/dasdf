@@ -1,307 +1,279 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Analysis Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --surface-color: #141414;
-            --border-color: #2a2a2a;
-            --text-color: #e0e0e0;
-            --header-color: #ffffff;
-            --label-color: #888888;
-            --value-color: #58a6ff;
-            --danger-color: #ff4d4d;
-            --warning-color: #ffc107;
-            --accent-color: #58a6ff;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 14px; }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-        .dashboard-container {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            height: 80vh;
-            max-height: 800px;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 1s ease-out;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Analysis Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-color: #0d1117;
+    --surface-color: #161b22;
+    --border-color: #21262d;
+    --text-color: #c9d1d9;
+    --header-color: #f0f6fc;
+    --label-color: #8b949e;
+    --value-color: #58a6ff;
+    --accent-color: #58a6ff;
+    --accent-hover: #79c0ff;
+    --danger-color: #ff5555;
+    --warning-color: #ffc107;
+}
 
-        .sidebar {
-            flex: 0 0 280px;
-            background: linear-gradient(180deg, #1a1a1a, #141414);
-            padding: 2rem;
-            border-right: 1px solid var(--border-color);
-        }
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-        .main-content::-webkit-scrollbar { width: 4px; }
-        .main-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+* {margin: 0; padding: 0; box-sizing: border-box;}
 
-        h1, h2 {
-            font-family: 'Inter', sans-serif;
-            color: var(--header-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        h1 { font-size: 1.5rem; text-align: center; }
-        h2 { font-size: 1.2rem; }
+html, body {
+    height: 100%;
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+}
 
-        .category-list { list-style: none; }
-        .category-list li {
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.3s ease;
-            font-weight: 500;
-        }
-        .category-list li:hover { background-color: var(--border-color); }
-        .category-list li.active {
-            background-color: var(--accent-color);
-            color: #ffffff;
-            font-weight: 700;
-            box-shadow: 0 0 15px rgba(88, 166, 255, 0.5);
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(88, 166, 255, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(88, 166, 255, 0.7); }
-        }
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
 
-        .data-item {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            word-break: break-word;
-            animation: itemFadeIn 0.5s ease-out forwards;
-            opacity: 0;
-            display: none;
-        }
-        .data-item.visible {
-            display: block;
-            opacity: 1;
-        }
-        @keyframes itemFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    background: var(--surface-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: fadeIn 1.2s ease-out;
+    border: 1px solid var(--border-color);
+}
 
-        .data-label {
-            display: block;
-            color: var(--label-color);
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-        }
-        .data-value {
-            font-family: 'Roboto Mono', monospace;
-            color: var(--value-color);
-        }
-        .data-value.danger { color: var(--danger-color); font-weight: 700; }
-        .data-value.warning { color: var(--warning-color); }
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.97);}
+    to {opacity: 1; transform: scale(1);}
+}
 
-        @media (max-width: 900px) {
-            body { padding: 0; }
-            .dashboard-container { flex-direction: column; height: 100vh; max-height: none; border-radius: 0; }
-            .sidebar { flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color); }
-            .category-list { display: flex; justify-content: center; gap: 0.5rem; }
-            .main-content { flex: 1; }
-        }
-    </style>
+.sidebar {
+    flex: 0 0 280px;
+    background: linear-gradient(180deg, #161b22, #0d1117);
+    padding: 2rem;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.sidebar h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    color: var(--header-color);
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+.category-list {list-style: none;}
+
+.category-list li {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: all 0.25s ease;
+    background: rgba(255,255,255,0.03);
+}
+
+.category-list li:hover {
+    background-color: rgba(88,166,255,0.15);
+    color: var(--accent-hover);
+    transform: translateX(3px);
+}
+
+.category-list li.active {
+    background: var(--accent-color);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 25px rgba(88,166,255,0.6);
+    animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0%, 100% {box-shadow: 0 0 15px rgba(88,166,255,0.4);}
+    50% {box-shadow: 0 0 30px rgba(88,166,255,0.8);}
+}
+
+.main-content {
+    flex: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+    position: relative;
+}
+
+.main-content::-webkit-scrollbar {width: 6px;}
+.main-content::-webkit-scrollbar-thumb {background: var(--border-color); border-radius: 10px;}
+
+h2 {
+    font-size: 1.4rem;
+    color: var(--header-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.data-item {
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+    background: rgba(255,255,255,0.02);
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.data-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.data-label {
+    display: block;
+    color: var(--label-color);
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.data-value {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--value-color);
+    font-size: 1rem;
+}
+
+.data-value.danger {color: var(--danger-color);}
+.data-value.warning {color: var(--warning-color);}
+
+@media (max-width: 900px) {
+    .dashboard-container {flex-direction: column; height: 100vh; max-height: none;}
+    .sidebar {flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color);}
+    .category-list {display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;}
+}
+</style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <h1>Categories</h1>
-            <ul class="category-list">
-                <li id="cat-computer" class="active">Computer Info</li>
-                <li id="cat-network">Network Info</li>
-                <li id="cat-browser">Browser Info</li>
-            </ul>
-        </div>
-        <div class="main-content">
-            <h2 id="report-title">Infos</h2>
-            <div id="report-content"></div>
-        </div>
+
+<div class="dashboard-container">
+    <div class="sidebar">
+        <h1>Categories</h1>
+        <ul class="category-list">
+            <li id="cat-computer" class="active">Computer Info</li>
+            <li id="cat-network">Network Info</li>
+            <li id="cat-browser">Browser Info</li>
+        </ul>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const reportContent = document.getElementById('report-content');
+    <div class="main-content">
+        <h2 id="report-title">Computer Info</h2>
+        <div id="report-content"></div>
+    </div>
+</div>
 
-            const addInfo = (category, label, value, type = '') => {
-                if (!value && typeof value !== 'number') value = 'N/A';
-                const item = document.createElement('div');
-                item.className = 'data-item';
-                item.dataset.category = category;
-                item.innerHTML = `<span class="data-label">${label}</span><span class="data-value ${type}">${value}</span>`;
-                reportContent.appendChild(item);
-            };
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const reportContent = document.getElementById('report-content');
 
-            const setupCategories = () => {
-                const categories = document.querySelectorAll('.category-list li');
-                const reportTitle = document.getElementById('report-title');
+    const addInfo = (category, label, value, type = '') => {
+        if (!value && typeof value !== 'number') value = 'N/A';
+        const item = document.createElement('div');
+        item.className = 'data-item';
+        item.dataset.category = category;
+        item.innerHTML = `
+            <span class="data-label">${label}</span>
+            <span class="data-value ${type}">${value}</span>`;
+        reportContent.appendChild(item);
+    };
 
-                const filterInfos = (category) => {
-                    const allItems = document.querySelectorAll('.data-item');
-                    let delay = 0;
-                    allItems.forEach(item => {
-                        if (item.dataset.category === category) {
-                            item.style.display = 'block';
-                            item.style.animationDelay = `${delay * 0.05}s`;
-                            item.classList.add('visible');
-                            delay++;
-                        } else {
-                            item.style.display = 'none';
-                            item.classList.remove('visible');
-                        }
-                    });
-                    const activeCat = document.querySelector(`#cat-${category}`);
-                    if (activeCat) reportTitle.textContent = activeCat.textContent;
-                };
+    const setupCategories = () => {
+        const categories = document.querySelectorAll('.category-list li');
+        const reportTitle = document.getElementById('report-title');
 
-                categories.forEach(cat => {
-                    cat.addEventListener('click', () => {
-                        categories.forEach(c => c.classList.remove('active'));
-                        cat.classList.add('active');
-                        const categoryId = cat.id.replace('cat-', '');
-                        filterInfos(categoryId);
-                    });
-                });
-
-                filterInfos('computer');
-            };
-
-            const getOS = () => {
-                const ua = navigator.userAgent;
-                if (/android/i.test(ua)) return "Android";
-                if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "iOS";
-                if (/linux/i.test(ua)) return "Linux";
-                if (/macintosh|mac os x/i.test(ua)) return "macOS";
-                if (/windows|win32/i.test(ua)) return "Windows";
-                return navigator.platform;
-            };
-
-            const getGpuInfo = () => {
-                try {
-                    const gl = document.createElement('canvas').getContext('webgl');
-                    const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    return rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Unavailable';
-                } catch (e) { return 'Unavailable'; }
-            };
-
-            const getFontFingerprint = () => {
-                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Comic Sans MS', 'Segoe UI', 'Consolas'];
-                const detected = fontList.filter(font => {
-                    const testSpan = document.createElement('span');
-                    testSpan.style.fontFamily = 'monospace';
-                    testSpan.textContent = 'wiwiwiwi';
-                    document.body.appendChild(testSpan);
-                    const monoWidth = testSpan.offsetWidth;
-                    testSpan.style.fontFamily = font + ',monospace';
-                    const fontWidth = testSpan.offsetWidth;
-                    document.body.removeChild(testSpan);
-                    return monoWidth !== fontWidth;
-                });
-                addInfo('browser', 'Detected Fonts', detected.join(', ') || 'Unknown', 'warning');
-            };
-
-            const getLocalIp = () => {
-                try {
-                    const pc = new RTCPeerConnection({iceServers: []});
-                    pc.createDataChannel('');
-                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
-                    pc.onicecandidate = e => {
-                        if (!e.candidate) return;
-                        const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
-                        if (ip) {
-                            addInfo('network', 'Local IP', ip, 'danger');
-                            pc.close();
-                        }
-                    };
-                } catch (e) {}
-            };
-
-            const gatherData = async () => {
-                addInfo('computer', 'Operating System', getOS(), 'danger');
-                addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
-                if (navigator.deviceMemory) addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
-                addInfo('computer', 'GPU', getGpuInfo(), 'danger');
-
-                try {
-                    const battery = await navigator.getBattery();
-                    addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
-                } catch {}
-
-                try {
-                    const devices = await navigator.mediaDevices.enumerateDevices();
-                    const media = devices.filter(d => d.label).map(d => `${d.kind.replace('input','')}: ${d.label}`).join(', ');
-                    if (media) addInfo('computer', 'Media Devices', media, 'warning');
-                } catch {}
-
-                getLocalIp();
-
-                try {
-                    const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
-                    addInfo('network', 'Public IP', ipData.ip, 'danger');
-                    const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/`)).json();
-                    addInfo('network', 'ISP', locData.org, 'warning');
-                    addInfo('network', 'Location', `${locData.city}, ${locData.country_name}`, 'danger');
-                    if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
-                        addInfo('network', 'VPN/Proxy', 'Possible', 'warning');
-                    }
-                } catch {}
-
-                if (navigator.connection) {
-                    addInfo('network', 'Connection Type', navigator.connection.effectiveType);
-                    addInfo('network', 'Downlink Speed', `${navigator.connection.downlink} Mbps`);
+        const filterInfos = (category) => {
+            const allItems = document.querySelectorAll('.data-item');
+            let delay = 0;
+            allItems.forEach(item => {
+                item.classList.remove('visible');
+                if (item.dataset.category === category) {
+                    setTimeout(() => {
+                        item.style.display = 'block';
+                        setTimeout(() => item.classList.add('visible'), 50 + delay * 70);
+                    }, delay * 80);
+                    delay++;
+                } else {
+                    item.style.display = 'none';
                 }
+            });
+            const activeCat = document.querySelector(`#cat-${category}`);
+            if (activeCat) reportTitle.textContent = activeCat.textContent;
+        };
 
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        addInfo('network', 'Precise GPS', `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (±${pos.coords.accuracy}m)`, 'danger');
-                    },
-                    () => {
-                        addInfo('network', 'Precise GPS', 'Access Denied', 'warning');
-                    }, { enableHighAccuracy: true }
-                );
-
-                addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
-                addInfo('browser', 'Languages', navigator.languages.join(', '));
-                addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
-                addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-                addInfo('browser', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'warning');
-
-                if (navigator.plugins) {
-                    const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
-                    if (plugins) addInfo('browser', 'Browser Plugins', plugins, 'warning');
-                }
-
-                getFontFingerprint();
-            };
-
-            gatherData().then(setupCategories);
+        categories.forEach(cat => {
+            cat.addEventListener('click', () => {
+                categories.forEach(c => c.classList.remove('active'));
+                cat.classList.add('active');
+                const categoryId = cat.id.replace('cat-', '');
+                filterInfos(categoryId);
+            });
         });
-    </script>
+
+        filterInfos('computer');
+    };
+
+    const getOS = () => {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android";
+        if (/iPad|iPhone|iPod/.test(ua)) return "iOS";
+        if (/linux/i.test(ua)) return "Linux";
+        if (/macintosh|mac os x/i.test(ua)) return "macOS";
+        if (/windows|win32/i.test(ua)) return "Windows";
+        return navigator.platform;
+    };
+
+    const getGpuInfo = () => {
+        try {
+            const gl = document.createElement('canvas').getContext('webgl');
+            const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            return rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Unavailable';
+        } catch { return 'Unavailable'; }
+    };
+
+    const gatherData = async () => {
+        addInfo('computer', 'Operating System', getOS(), 'danger');
+        addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
+        if (navigator.deviceMemory)
+            addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
+        addInfo('computer', 'GPU', getGpuInfo(), 'danger');
+
+        try {
+            const battery = await navigator.getBattery();
+            addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
+        } catch {}
+
+        try {
+            const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
+            addInfo('network', 'Public IP', ipData.ip, 'danger');
+        } catch {}
+
+        addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
+        addInfo('browser', 'Languages', navigator.languages.join(', '));
+        addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height}`);
+        addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    };
+
+    gatherData().then(() => setupCategories());
+});
+</script>
+
 </body>
 </html>
