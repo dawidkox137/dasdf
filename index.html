@@ -134,6 +134,16 @@
                 infoDelay++;
             };
 
+            const getOS = () => {
+                const ua = navigator.userAgent;
+                if (/android/i.test(ua)) return "Android";
+                if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "iOS";
+                if (/linux/i.test(ua)) return "Linux";
+                if (/macintosh|mac os x/i.test(ua)) return "macOS";
+                if (/windows|win32/i.test(ua)) return "Windows";
+                return navigator.platform;
+            };
+
             const getGpuInfo = () => {
                 try {
                     const canvas = document.createElement('canvas');
@@ -162,7 +172,7 @@
                 const baseFonts = ['monospace', 'sans-serif', 'serif'];
                 const testString = "mmmmmmmmmmlli";
                 const testSize = '72px';
-                const h = document.getElementsByTagName("body")[0];
+                const h = document.body;
                 const s = document.createElement("span");
                 s.style.fontSize = testSize;
                 s.innerHTML = testString;
@@ -190,7 +200,7 @@
             };
 
             const gatherData = async () => {
-                addInfo('OS', navigator.platform, 'danger');
+                addInfo('Operating System', getOS(), 'danger');
                 addInfo('CPU Arch', navigator.cpuArchitecture || 'N/A', 'danger');
                 addInfo('CPU Cores', navigator.hardwareConcurrency, 'danger');
                 addInfo('RAM (est.)', navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'N/A', 'danger');
