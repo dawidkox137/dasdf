@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORE_SYS // DEEP_SCAN PROTOCOL</title>
+    <title>CRITICAL_ERROR // PROTOCOL_BREACH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glow-color: #00aaff;
+            --glow-color: #ff3b3b; /* Zmieniono na czerwony dla groźniejszego efektu */
             --danger-color: #ff4d4d;
             --warning-color: #ffcc00;
             --success-color: #00ffaa;
-            --bg-color: #000508;
+            --bg-color: #000000;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color );
@@ -34,26 +30,20 @@
             position: relative;
         }
         
-        /* Efekt siatki i linii skanowania w tle */
         body::before {
             content: '';
-            position: absolute;
-            top: 0; left: 0;
+            position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 170, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 170, 255, 0.05) 1px, transparent 1px);
-            background-size: 2rem 2rem;
+                linear-gradient(rgba(255, 59, 59, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 59, 59, 0.07) 1px, transparent 1px);
+            background-size: 2.5rem 2.5rem;
             z-index: 0;
-            animation: scanlines 10s linear infinite;
+            animation: scanlines 8s linear infinite;
         }
         
-        @keyframes scanlines {
-            from { background-position: 0 0; }
-            to { background-position: 0 2rem; }
-        }
+        @keyframes scanlines { from { background-position: 0 0; } to { background-position: 0 2.5rem; } }
 
-        /* Główny kontener layoutu */
         .layout-container {
             display: flex;
             flex-direction: row;
@@ -61,102 +51,90 @@
             align-items: center;
             width: 100%;
             height: 100%;
-            padding: 20px;
+            padding: 15px;
             gap: 20px;
             z-index: 1;
         }
 
-        /* Kontener z animacją ładowania */
         .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            max-width: 700px;
+            max-width: 600px;
         }
 
         .loading-circle {
-            width: 50px;
-            height: 50px;
-            border: 2px solid rgba(0, 170, 255, 0.2);
+            width: 50px; height: 50px;
+            border: 2px solid rgba(255, 59, 59, 0.3);
             border-top: 2px solid var(--glow-color);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             margin-bottom: 25px;
             transition: opacity 0.5s ease, transform 0.5s ease;
-            box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+            box-shadow: 0 0 20px var(--glow-color);
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .loading-text {
-            font-size: 16px;
-            font-weight: 400;
-            margin-bottom: 30px;
+            font-size: 16px; font-weight: 700;
+            margin-bottom: 25px;
             color: #fff;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            text-shadow: 0 0 5px var(--glow-color);
+            text-shadow: 0 0 8px var(--glow-color);
         }
 
         .progress-container {
-            width: 100%;
-            height: 8px;
+            width: 100%; height: 6px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
+            border-radius: 3px;
             overflow: hidden;
             margin-bottom: 15px;
-            border: 1px solid rgba(0, 170, 255, 0.2);
+            border: 1px solid rgba(255, 59, 59, 0.3);
         }
 
         .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff3b3b, #ffcc00, #4cd964, #5ac8fa, #af52de, #ff3b3b);
-            background-size: 300% 100%;
-            border-radius: 4px;
-            animation: rainbow-flow 4s linear infinite, pulse-glow 1.5s ease-in-out infinite;
-            transition: width 0.2s ease-in-out;
+            height: 100%; width: 0%;
+            background: var(--glow-color);
+            border-radius: 3px;
+            animation: pulse-glow 1s ease-in-out infinite;
+            transition: width 0.1s linear;
         }
 
-        @keyframes rainbow-flow { 100% { background-position: 300% 50%; } }
-        @keyframes pulse-glow { 50% { box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.4); } }
+        @keyframes pulse-glow { 50% { box-shadow: 0 0 15px 3px var(--glow-color); } }
 
-        .timer {
-            font-size: 12px;
-            color: #ccc;
-            text-transform: uppercase;
-        }
+        .timer { font-size: 12px; color: #ccc; text-transform: uppercase; }
 
-        /* Kontener z informacjami */
         .info-container {
-            flex: 1;
+            flex: 1.2;
             height: 100%;
             overflow-y: auto;
             border-left: 1px solid var(--glow-color);
             padding: 15px;
-            background: rgba(0, 5, 8, 0.5);
-            backdrop-filter: blur(2px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
         }
         
-        .info-container::-webkit-scrollbar { width: 4px; }
+        .info-container::-webkit-scrollbar { width: 3px; }
         .info-container::-webkit-scrollbar-track { background: transparent; }
-        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); border-radius: 4px; }
+        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); }
 
         .info-item {
-            margin-bottom: 8px;
+            margin-bottom: 7px;
             font-size: 12px;
             color: #a0a0a0;
             line-height: 1.5;
             opacity: 0;
-            animation: itemFadeInUp 0.4s ease forwards;
+            animation: itemFadeInUp 0.3s ease forwards;
             word-break: break-all;
         }
 
         .info-value { color: var(--success-color); font-weight: 500; }
         .info-item.warning .info-value { color: var(--warning-color); }
-        .info-item.danger .info-value { color: var(--danger-color); }
+        .info-item.danger .info-value { color: var(--danger-color); font-weight: 700; }
 
         @keyframes itemFadeInUp { to { opacity: 1; transform: translateY(0); } }
 
@@ -164,25 +142,10 @@
         .fade-in { opacity: 1; visibility: visible; transform: translateY(0); transition: all 0.5s ease; }
         .loading-circle.fade-out { opacity: 0; transform: scale(0.9); }
 
-        /* === PERFEKCYJNA RESPONSYWNOŚĆ === */
         @media (max-width: 900px) {
-            .layout-container {
-                flex-direction: column;
-                padding: 10px;
-                height: 100%;
-            }
-            .main-container {
-                flex: 0;
-                width: 100%;
-                padding-top: 20px;
-            }
-            .info-container {
-                flex: 1;
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--glow-color);
-                margin-top: 15px;
-            }
+            .layout-container { flex-direction: column; padding: 10px; }
+            .main-container { flex: 0; width: 100%; padding-top: 15px; }
+            .info-container { flex: 1; width: 100%; border-left: none; border-top: 1px solid var(--glow-color); margin-top: 15px; }
             .loading-text { font-size: 14px; }
             .info-item { font-size: 11px; }
         }
@@ -192,71 +155,43 @@
     <div class="layout-container">
         <div class="main-container">
             <div class="loading-circle" id="loadingCircle"></div>
-            <div class="loading-text hidden" id="loadingText">Inicjowanie protokołu...</div>
+            <div class="loading-text hidden" id="loadingText">DOSTĘP NIEAUTORYZOWANY</div>
             <div class="progress-container hidden" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <div class="timer hidden" id="timer">Zakończenie za: <span id="timeLeft">120</span>s</div>
+            <div class="timer hidden" id="timer">KOŃCZENIE SESJI ZA: <span id="timeLeft">30</span>s</div>
         </div>
-        <div class="info-container hidden" id="infoContainer">
-            <!-- "Groźne" dane pojawią się tutaj -->
-        </div>
+        <div class="info-container hidden" id="infoContainer"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 120;
+            const TOTAL_TIME = 30; // BARDZO SZYBKO!
             let timeLeft = TOTAL_TIME;
-            const REDIRECT_URL = 'https://www.google.com'; // <-- ZMIEŃ TEN LINK
+            const REDIRECT_URL = 'https://www.google.com/search?q=jak+usunąć+wirusa+z+komputera'; // "Straszny" redirect
 
             const progressBar = document.getElementById('progressBar' );
             const timeLeftSpan = document.getElementById('timeLeft');
             const loadingText = document.getElementById('loadingText');
 
             function init() {
-                showUIElements();
-                startTimers();
-                gatherAndDisplayInfo();
-                updateLoadingText();
-            }
-
-            function showUIElements() {
-                setTimeout(() => document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in')), 500);
-                setTimeout(() => document.getElementById('loadingCircle').classList.add('fade-out'), 2500);
-            }
-
-            function startTimers() {
+                document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in'));
+                setTimeout(() => document.getElementById('loadingCircle').classList.add('fade-out'), 2000);
+                
                 const timerInterval = setInterval(() => {
                     timeLeft--;
                     if (timeLeftSpan) timeLeftSpan.textContent = timeLeft;
+                    const progress = (TOTAL_TIME - timeLeft) / TOTAL_TIME * 100;
+                    progressBar.style.width = `${Math.min(progress, 100)}%`;
+
                     if (timeLeft <= 0) {
                         clearInterval(timerInterval);
-                        loadingText.textContent = "Analiza zakończona. Przekierowanie...";
+                        loadingText.textContent = "DOSTĘP UZYSKANY. LOGI ZAPISANE.";
                         setTimeout(() => window.location.href = REDIRECT_URL, 2000);
                     }
                 }, 1000);
-
-                const progressInterval = setInterval(() => {
-                    const progress = (TOTAL_TIME - timeLeft) / TOTAL_TIME * 100;
-                    progressBar.style.width = `${Math.min(progress, 100)}%`;
-                    if (progress >= 100) clearInterval(progressInterval);
-                }, 100);
-            }
-            
-            function updateLoadingText() {
-                const messages = [
-                    { time: TOTAL_TIME - 5, text: "Nawiązywanie połączenia z serwerem..." },
-                    { time: TOTAL_TIME - 15, text: "Omijanie zabezpieczeń systemowych..." },
-                    { time: TOTAL_TIME - 30, text: "Wstrzykiwanie wektora analizy..." },
-                    { time: TOTAL_TIME - 45, text: "Pobieranie sygnatur sprzętowych..." },
-                    { time: TOTAL_TIME - 60, text: "Analiza śladu cyfrowego..." },
-                    { time: TOTAL_TIME - 80, text: "Dekodowanie pakietów sieciowych..." },
-                    { time: TOTAL_TIME - 100, text: "Wykrywanie podatności..." },
-                ];
-                setInterval(() => {
-                    const currentMessage = messages.find(m => timeLeft <= m.time && timeLeft > (m.time - 15));
-                    if (currentMessage) loadingText.textContent = currentMessage.text;
-                }, 1000);
+                
+                gatherAndDisplayInfo();
             }
 
             let infoDelay = 0;
@@ -265,70 +200,75 @@
                 if (!infoContainer) return;
                 const item = document.createElement('div');
                 item.className = `info-item ${type}`;
-                item.style.animationDelay = `${infoDelay * 50}ms`;
+                item.style.animationDelay = `${infoDelay * 30}ms`; // Szybsze pojawianie się
                 item.innerHTML = `${label}: <span class="info-value">${value || 'N/A'}</span>`;
                 infoContainer.appendChild(item);
                 infoDelay++;
             }
 
             async function gatherAndDisplayInfo() {
-                addInfoItem('Status połączenia', 'Zabezpieczone (TLS v1.3)');
+                addInfoItem('STATUS', 'PRZEŁAMYWANIE ZABEZPIECZEŃ...', 'warning');
+                
+                // --- LOKALNY ADRES IP (NAJGROŹNIEJSZE) ---
+                try {
+                    const pc = new RTCPeerConnection({iceServers:[]});
+                    pc.createDataChannel('');
+                    pc.createOffer().then(pc.setLocalDescription.bind(pc));
+                    pc.onicecandidate = (ice) => {
+                        if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                        const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate)[1];
+                        addInfoItem('LOKALNY ADRES IP SIECI', ip, 'danger');
+                        pc.onicecandidate = null;
+                    };
+                } catch (e) { addInfoItem('LOKALNY ADRES IP', 'Ukryty (WebRTC zablokowane)', 'success'); }
+
+                // --- PUBLICZNY ADRES IP ---
                 try {
                     const ipResponse = await fetch('https://api.ipify.org?format=json' );
                     const ipData = await ipResponse.json();
-                    addInfoItem('Publiczny adres IP', ipData.ip, 'danger');
-                    const locationResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/` );
-                    const locData = await locationResponse.json();
-                    addInfoItem('ISP (Dostawca)', locData.org, 'warning');
-                    addInfoItem('Lokalizacja', `${locData.city}, ${locData.country_name}`, 'danger');
-                    addInfoItem('Koordynaty (szacowane)', `${locData.latitude}, ${locData.longitude}`, 'danger');
-                } catch (error) {
-                    addInfoItem('Adres IP', 'Ukryty za proxy', 'warning');
-                }
+                    addInfoItem('PUBLICZNY ADRES IP', ipData.ip, 'danger');
+                    const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
+                    addInfoItem('DOSTAWCA INTERNETU', locData.org, 'warning');
+                    addInfoItem('LOKALIZACJA (GEO-IP)', `${locData.city}, ${locData.country_name}`, 'danger');
+                    addInfoItem('KOORDYNATY (GPS)', `${locData.latitude}, ${locData.longitude}`, 'danger');
+                } catch (e) { addInfoItem('PUBLICZNY ADRES IP', 'Błąd namierzania', 'warning'); }
 
-                addInfoItem('System operacyjny', navigator.platform, 'warning');
-                addInfoItem('Liczba rdzeni logicznych', navigator.hardwareConcurrency, 'warning');
-                if (navigator.deviceMemory) addInfoItem('Pamięć RAM', `${navigator.deviceMemory} GB`);
+                // --- DANE SYSTEMOWE I SPRZĘTOWE ---
+                addInfoItem('SYSTEM OPERACYJNY', navigator.platform, 'warning');
+                addInfoItem('RDZENIE PROCESORA', navigator.hardwareConcurrency, 'warning');
+                if (navigator.deviceMemory) addInfoItem('PAMIĘĆ RAM', `${navigator.deviceMemory} GB`, 'warning');
                 
-                addInfoItem('Przeglądarka', navigator.vendor);
-                addInfoItem('Cookies', navigator.cookieEnabled ? 'Aktywne (śledzenie możliwe)' : 'Zablokowane', 'warning');
+                // --- DANE PRZEGLĄDARKI ---
+                addInfoItem('PRZEGLĄDARKA', navigator.userAgent, 'danger');
+                addInfoItem('JĘZYK', navigator.language);
+                addInfoItem('COOKIES', navigator.cookieEnabled ? 'Włączone (Śledzenie aktywne)' : 'Wyłączone', 'danger');
                 
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (gl) {
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'Ukryty';
-                    addInfoItem('Karta graficzna (GPU)', renderer, 'danger');
-                }
-                
-                // --- NOWE, "GROŹNE" DANE ---
+                // --- ODCISKI PALCA (FINGERPRINTING) ---
                 try {
-                    const battery = await navigator.getBattery();
-                    addInfoItem('Poziom baterii', `${(battery.level * 100).toFixed(0)}%`, battery.level < 0.2 ? 'danger' : 'warning');
-                    addInfoItem('Status ładowania', battery.charging ? 'Podłączono (śledzenie aktywne)' : 'Odłączono', 'warning');
-                } catch (e) { /* Bateria API niedostępne */ }
-
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    const renderer = gl.getExtension('WEBGL_debug_renderer_info')?.UNMASKED_RENDERER_WEBGL;
+                    addInfoItem('KARTA GRAFICZNA (GPU)', gl.getParameter(renderer), 'danger');
+                } catch (e) { addInfoItem('KARTA GRAFICZNA', 'Maskowana', 'warning'); }
+                
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    // ... skomplikowana logika generowania odcisku audio
-                    addInfoItem('Odcisk palca audio', 'Wygenerowano unikalny hash', 'danger');
+                    addInfoItem('ODCISK PALCA AUDIO', 'Wygenerowano unikalny hash', 'danger');
                     audioContext.close();
-                } catch (e) { /* Audio API niedostępne */ }
+                } catch (e) {}
 
-                if (navigator.plugins && navigator.plugins.length > 0) {
-                    let pluginList = Array.from(navigator.plugins).map(p => p.name).join(', ');
-                    addInfoItem('Zainstalowane wtyczki', pluginList.substring(0, 50) + '...', 'warning');
-                }
+                // --- BATERIA I CZUJNIKI ---
+                try {
+                    const battery = await navigator.getBattery();
+                    addInfoItem('POZIOM BATERII', `${(battery.level * 100).toFixed(0)}%`, battery.level < 0.2 ? 'danger' : 'warning');
+                    addInfoItem('STATUS ŁADOWANIA', battery.charging ? 'Podłączono (Monitorowanie aktywne)' : 'Odłączono', 'warning');
+                } catch (e) {}
 
                 if ('DeviceMotionEvent' in window) {
-                    window.addEventListener('devicemotion', (e) => {
-                        const acc = e.accelerationIncludingGravity;
-                        if (acc.x) addInfoItem('Odczyt akcelerometru', `X:${acc.x.toFixed(2)} Y:${acc.y.toFixed(2)} Z:${acc.z.toFixed(2)}`, 'danger');
-                    }, { once: true });
+                    addInfoItem('AKCELEROMETR', 'Wykryto, odczytuję dane...', 'danger');
                 }
                 
-                addInfoItem('Pełny identyfikator Agenta', navigator.userAgent, 'danger');
+                addInfoItem('PODSUMOWANIE', 'Ustalono tożsamość cyfrową.', 'danger');
             }
 
             init();
