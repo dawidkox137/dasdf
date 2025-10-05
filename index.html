@@ -68,38 +68,6 @@
       background: #555;
       cursor: not-allowed;
     }
-
-    /* Modal reklamy */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: #1a1c20;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 90%;
-      width: 400px;
-      text-align: center;
-    }
-    .modal iframe {
-      width: 100%;
-      height: 200px;
-      border: none;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    .modal button {
-      background: #ffaa00;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-    }
   </style>
 </head>
 <body>
@@ -113,94 +81,102 @@
     <button id="redirectBtn" disabled>Przekieruj do pliku</button>
   </div>
 
-  <!-- Modal reklamy -->
-  <div class="modal" id="adModal">
-    <div class="modal-content">
-      <iframe id="ytVideo" src="" allowfullscreen></iframe>
-      <button onclick="closeAd()">Zamknij reklamę</button>
-    </div>
-  </div>
-
   <script>
-    const totalTime = 30; // prawdziwe 20s ładowania
-    const claimedTime = 10; // użytkownik myśli że 10s
-    const adInterval = 4; // reklama co 4s
-    const preRedirectAds = 5;
-    const redirectUrl = "https://limewire.com/d/Uwc3k#fBGsTokD52"; // <- Zmień na właściwy link
+    const initialLoadTime = 30; // Fałszywe 10s, naprawdę 30s
+    const extraLoadTime = 30; // Dodatkowe 30s po kliknięciu
+    const adInterval = 4; // co 4 sekundy
+    const preRedirectAds = 4;
+    const redirectUrl = "https://limewire.com/d/Uwc3k#fBGsTokD52";
 
-    let progress = 0;
-    let secondsPassed = 0;
-    let adsShown = 0;
-    let redirectAdsShown = 0;
-    let adTimer;
-    let loadTimer;
-    let inRedirectAds = false;
+    const redirectBtn = document.getElementById("redirectBtn");
+    const progressBar = document.getElementById("progress");
+    const adsLog = document.getElementById("adsLog");
 
-    const progressBar = document.getElementById('progress');
-    const adsLog = document.getElementById('adsLog');
-    const redirectBtn = document.getElementById('redirectBtn');
-    const adModal = document.getElementById('adModal');
-    const ytVideo = document.getElementById('ytVideo');
-
-    const sampleVideos = [
-      "https://www.youtube.com/watch?v=ds6AqaOK-gQ&list=RDds6AqaOK-gQ&start_radio=1",
-      "https://www.youtube.com/watch?v=_kV87STn6FM&list=RD_kV87STn6FM&start_radio=1",
-      "https://www.youtube.com/watch?v=4Cw113pFkJo&list=RD4Cw113pFkJo&start_radio=1",
-      "https://www.youtube.com/watch?v=062AaADlqZo&list=RD062AaADlqZo&start_radio=1"
+    const sampleAds = [
+      "https://www.youtube.com/watch?v=ds6AqaOK-gQ",
+      "https://www.youtube.com/watch?v=_kV87STn6FM",
+      "https://www.youtube.com/watch?v=4Cw113pFkJo",
+      "https://www.youtube.com/watch?v=062AaADlqZo",
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     ];
 
-    function showAd(logPrefix = "Reklama") {
-      const video = sampleVideos[Math.floor(Math.random() * sampleVideos.length)];
-      ytVideo.src = video;
-      adModal.style.display = "flex";
-      adsLog.innerHTML += `${logPrefix}: wyświetlono reklamę<br>`;
+    let secondsPassed = 0;
+    let adTimer;
+    let loadTimer;
+    let inExtraLoading = false;
+    let extraSeconds = 0;
+    let redirectAdCount = 0;
+
+    function showAd(log = "Reklama") {
+      const adUrl = sampleAds[Math.floor(Math.random() * sampleAds.length)];
+      window.open(adUrl, "_blank");
+      adsLog.innerHTML += `${log}: otwarto reklamę<br>`;
     }
 
-    function closeAd() {
-      adModal.style.display = "none";
-      ytVideo.src = "";
-
-      if (inRedirectAds) {
-        redirectAdsShown++;
-        if (redirectAdsShown < preRedirectAds) {
-          setTimeout(() => {
-            showAd("Reklama przed przekierowaniem");
-          }, 500);
-        } else {
-          window.location.href = redirectUrl;
-        }
-      }
+    function updateProgressBar(percent) {
+      progressBar.style.width = percent + "%";
     }
 
-    function startLoading() {
+    function startInitialLoading() {
+      adTimer = setInterval(() => {
+        if (!inExtraLoading) showAd("Reklama");
+      }, adInterval * 1000);
+
       loadTimer = setInterval(() => {
         secondsPassed++;
-        progress = (secondsPassed / totalTime) * 100;
-        progressBar.style.width = progress + "%";
+        const percent = Math.min((secondsPassed / initialLoadTime) * 100, 100);
+        updateProgressBar(percent);
 
-        if (secondsPassed >= totalTime) {
+        if (secondsPassed >= initialLoadTime) {
           clearInterval(loadTimer);
-          clearInterval(adTimer);
           redirectBtn.disabled = false;
           adsLog.innerHTML += "Gotowe do przekierowania.<br>";
         }
       }, 1000);
-
-      adTimer = setInterval(() => {
-        showAd("Reklama");
-        adsShown++;
-      }, adInterval * 1000);
     }
 
-    redirectBtn.addEventListener('click', () => {
+    function startExtraLoading() {
+      inExtraLoading = true;
+      redirectBtn.textContent = "Trwa końcowe weryfikowanie...";
+      adsLog.innerHTML += "Uruchomiono końcowe ładowanie...<br>";
+
+      let interval = setInterval(() => {
+        extraSeconds++;
+
+        // Otwieranie dodatkowych reklam co 4s
+        if (extraSeconds % 4 === 0) {
+          showAd("Reklama końcowa");
+        }
+
+        const percent = Math.min((extraSeconds / extraLoadTime) * 100, 100);
+        updateProgressBar(percent);
+
+        if (extraSeconds >= extraLoadTime) {
+          clearInterval(interval);
+          redirectBtn.textContent = "Trwa przekierowywanie...";
+          adsLog.innerHTML += "Przekierowanie...<br>";
+
+          // Jeszcze jedna runda reklam
+          const spamInterval = setInterval(() => {
+            if (redirectAdCount < preRedirectAds) {
+              showAd("Reklama przed końcem");
+              redirectAdCount++;
+            } else {
+              clearInterval(spamInterval);
+              window.location.href = redirectUrl;
+            }
+          }, 1500);
+        }
+      }, 1000);
+    }
+
+    redirectBtn.addEventListener("click", () => {
       redirectBtn.disabled = true;
-      inRedirectAds = true;
-      adsLog.innerHTML += "Kliknięto przekierowanie. Przed przejściem wyświetlanych będzie kilka reklam...<br>";
-      showAd("Reklama przed przekierowaniem");
+      startExtraLoading();
     });
 
     window.onload = () => {
-      startLoading();
+      startInitialLoading();
     };
   </script>
 </body>
