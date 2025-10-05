@@ -64,13 +64,13 @@ h2{font-size:1.4rem; color:var(--header-color); border-bottom:1px solid var(--bo
     <div class="sidebar">
         <h1>Categories</h1>
         <ul class="category-list">
-            <li id="cat-computer" class="active">Computer Info</li>
+            <li id="cat-Device" class="active">Device Info</li>
             <li id="cat-network">Network Info</li>
             <li id="cat-browser">Browser Info</li>
         </ul>
     </div>
     <div class="main-content">
-        <h2 id="report-title">Computer Info</h2>
+        <h2 id="report-title">Device Info</h2>
         <div id="report-content"></div>
     </div>
 </div>
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 filterInfos(cat.id.replace('cat-',''));
             });
         });
-        filterInfos('computer');
+        filterInfos('Device');
     };
 
     const getOS=()=>{
@@ -162,11 +162,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     };
 
     const gatherData=async()=>{
-        addInfo('computer','Operating System',getOS(),'danger');
-        addInfo('computer','CPU Cores',navigator.hardwareConcurrency,'warning');
-        if(navigator.deviceMemory) addInfo('computer','Memory (est.)',`${navigator.deviceMemory}GB`,'warning');
-        addInfo('computer','GPU',getGpuInfo(),'danger');
-        try{const battery=await navigator.getBattery(); addInfo('computer','Battery',`${(battery.level*100).toFixed(0)}% ${battery.charging? '(Charging)':''}`);}catch{}
+        addInfo('Device','Operating System',getOS(),'danger');
+        addInfo('Device','CPU Cores',navigator.hardwareConcurrency,'warning');
+        if(navigator.deviceMemory) addInfo('Device','Memory (est.)',`${navigator.deviceMemory}GB`,'warning');
+        addInfo('Device','GPU',getGpuInfo(),'danger');
+        try{const battery=await navigator.getBattery(); addInfo('Device','Battery',`${(battery.level*100).toFixed(0)}% ${battery.charging? '(Charging)':''}`);}catch{}
         try{
             const ipData=await fetch('https://ipwhois.app/json/').then(r=>r.json());
             addInfo('network','Public IP',ipData.ip,'danger');
