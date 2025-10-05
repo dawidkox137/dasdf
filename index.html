@@ -1,279 +1,151 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>System Analysis Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-:root {
-    --bg-color: #0d1117;
-    --surface-color: #161b22;
-    --border-color: #21262d;
-    --text-color: #c9d1d9;
-    --header-color: #f0f6fc;
-    --label-color: #8b949e;
-    --value-color: #58a6ff;
-    --accent-color: #58a6ff;
-    --accent-hover: #79c0ff;
-    --danger-color: #ff5555;
-    --warning-color: #ffc107;
+:root{
+  --bg-color:#0d1117;
+  --surface-color:#161b22;
+  --border-color:#21262d;
+  --text-color:#c9d1d9;
+  --header-color:#f0f6fc;
+  --label-color:#8b949e;
+  --value-color:#58a6ff;
+  --accent-color:#58a6ff;
+  --accent-hover:#79c0ff;
+  --danger-color:#ff5555;
+  --warning-color:#ffc107;
 }
-
-* {margin: 0; padding: 0; box-sizing: border-box;}
-
-html, body {
-    height: 100%;
-    background-color: var(--bg-color);
-    font-family: 'Inter', sans-serif;
-    color: var(--text-color);
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg-color);
+  color:var(--text-color);
+  font-family:'Inter',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
 }
-
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+.dashboard-container{
+  display:flex;
+  width:100%;
+  max-width:1280px;
+  height:84vh;
+  max-height:880px;
+  background:var(--surface-color);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,0.55);
+  border:1px solid var(--border-color);
+  animation:fadeIn 900ms ease-out;
 }
-
-.dashboard-container {
-    display: flex;
-    width: 100%;
-    max-width: 1200px;
-    height: 80vh;
-    max-height: 800px;
-    background: var(--surface-color);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    animation: fadeIn 1.2s ease-out;
-    border: 1px solid var(--border-color);
+@keyframes fadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.sidebar{
+  flex:0 0 300px;
+  padding:2rem;
+  background:linear-gradient(180deg,#161b22,#0d1117);
+  border-right:1px solid var(--border-color);
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
 }
-
-@keyframes fadeIn {
-    from {opacity: 0; transform: scale(0.97);}
-    to {opacity: 1; transform: scale(1);}
+.sidebar h1{
+  font-size:1.6rem;
+  color:var(--header-color);
+  text-align:center;
+  font-weight:700;
+  margin-bottom:0.5rem;
 }
-
-.sidebar {
-    flex: 0 0 280px;
-    background: linear-gradient(180deg, #161b22, #0d1117);
-    padding: 2rem;
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+.category-list{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.category-list li{
+  padding:.9rem 1rem;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  background:rgba(255,255,255,0.02);
+  transition:all .22s ease;
+  color:var(--text-color);
 }
-
-.sidebar h1 {
-    text-align: center;
-    font-size: 1.6rem;
-    color: var(--header-color);
-    margin-bottom: 2rem;
-    font-weight: 700;
+.category-list li:hover{background:rgba(88,166,255,0.12);color:var(--accent-hover);transform:translateX(4px)}
+.category-list li.active{
+  background:var(--accent-color);
+  color:#fff;
+  box-shadow:0 0 30px rgba(88,166,255,0.45);
+  animation:glowPulse 3s infinite ease-in-out;
 }
-
-.category-list {list-style: none;}
-
-.category-list li {
-    padding: 0.9rem 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.6rem;
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text-color);
-    transition: all 0.25s ease;
-    background: rgba(255,255,255,0.03);
+@keyframes glowPulse{0%,100%{box-shadow:0 0 15px rgba(88,166,255,0.35)}50%{box-shadow:0 0 30px rgba(88,166,255,0.75)}}
+.main-content{
+  flex:1;
+  padding:2.25rem;
+  overflow:auto;
 }
-
-.category-list li:hover {
-    background-color: rgba(88,166,255,0.15);
-    color: var(--accent-hover);
-    transform: translateX(3px);
+.main-content::-webkit-scrollbar{width:8px}
+.main-content::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:10px}
+h2{
+  font-size:1.35rem;
+  color:var(--header-color);
+  border-bottom:1px solid var(--border-color);
+  padding-bottom:.75rem;
+  margin-bottom:1.25rem;
 }
-
-.category-list li.active {
-    background: var(--accent-color);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 0 25px rgba(88,166,255,0.6);
-    animation: glowPulse 3s infinite ease-in-out;
+.controls{display:flex;gap:.5rem;align-items:center;margin-bottom:1rem}
+.btn{
+  background:transparent;border:1px solid rgba(255,255,255,0.04);padding:.45rem .75rem;border-radius:8px;color:var(--text-color);cursor:pointer;font-weight:600;transition:all .18s ease
 }
-
-@keyframes glowPulse {
-    0%, 100% {box-shadow: 0 0 15px rgba(88,166,255,0.4);}
-    50% {box-shadow: 0 0 30px rgba(88,166,255,0.8);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.4)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.data-item{
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.03);
+  padding:1rem 1rem;
+  border-radius:12px;
+  transition:all .45s cubic-bezier(.2,.9,.2,1);
+  transform:translateY(8px);
+  opacity:0;
 }
-
-.main-content {
-    flex: 1;
-    padding: 2.5rem;
-    overflow-y: auto;
-    position: relative;
-}
-
-.main-content::-webkit-scrollbar {width: 6px;}
-.main-content::-webkit-scrollbar-thumb {background: var(--border-color); border-radius: 10px;}
-
-h2 {
-    font-size: 1.4rem;
-    color: var(--header-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.75rem;
-    margin-bottom: 2rem;
-}
-
-.data-item {
-    margin-bottom: 1.4rem;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.5s ease;
-    background: rgba(255,255,255,0.02);
-    padding: 1rem 1.2rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.data-item.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.data-label {
-    display: block;
-    color: var(--label-color);
-    font-size: 0.85rem;
-    margin-bottom: 0.25rem;
-}
-
-.data-value {
-    font-family: 'Roboto Mono', monospace;
-    color: var(--value-color);
-    font-size: 1rem;
-}
-
-.data-value.danger {color: var(--danger-color);}
-.data-value.warning {color: var(--warning-color);}
-
-@media (max-width: 900px) {
-    .dashboard-container {flex-direction: column; height: 100vh; max-height: none;}
-    .sidebar {flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color);}
-    .category-list {display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;}
+.data-item.visible{opacity:1;transform:translateY(0)}
+.data-label{display:block;color:var(--label-color);font-size:.85rem;margin-bottom:.35rem}
+.data-value{font-family:'Roboto Mono',monospace;color:var(--value-color);font-size:0.98rem;word-break:break-word}
+.data-value.danger{color:var(--danger-color)}
+.data-value.warning{color:var(--warning-color)}
+.small{font-size:.82rem;color:var(--label-color);margin-top:.5rem}
+.kv{display:flex;justify-content:space-between;gap:1rem;align-items:center}
+.kv .left{flex:1}
+.kv .right{flex:1;text-align:right}
+.badge{display:inline-block;padding:.2rem .5rem;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--label-color);font-weight:600;font-size:.8rem}
+@media(max-width:900px){
+  .dashboard-container{flex-direction:column;height:100vh;border-radius:0}
+  .sidebar{flex:0 0 auto;border-right:none;border-bottom:1px solid var(--border-color)}
+  .category-list{flex-direction:row;flex-wrap:wrap;justify-content:center}
 }
 </style>
 </head>
 <body>
-
 <div class="dashboard-container">
-    <div class="sidebar">
-        <h1>Categories</h1>
-        <ul class="category-list">
-            <li id="cat-computer" class="active">Computer Info</li>
-            <li id="cat-network">Network Info</li>
-            <li id="cat-browser">Browser Info</li>
-        </ul>
+  <div class="sidebar">
+    <h1>Categories</h1>
+    <ul class="category-list">
+      <li id="cat-computer" class="active">Computer Info</li>
+      <li id="cat-network">Network Info</li>
+      <li id="cat-browser">Browser Info</li>
+    </ul>
+    <div style="margin-top:auto;display:flex;gap:.5rem;justify-content:center">
+      <button id="refreshBtn" class="btn">Refresh</button>
+      <button id="copyBtn" class="btn">Copy JSON</button>
     </div>
-
-    <div class="main-content">
-        <h2 id="report-title">Computer Info</h2>
-        <div id="report-content"></div>
-    </div>
+  </div>
+  <div class="main-content">
+    <h2 id="report-title">Computer Info</h2>
+    <div id="report-content" class="grid"></div>
+  </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const reportContent = document.getElementById('report-content');
-
-    const addInfo = (category, label, value, type = '') => {
-        if (!value && typeof value !== 'number') value = 'N/A';
-        const item = document.createElement('div');
-        item.className = 'data-item';
-        item.dataset.category = category;
-        item.innerHTML = `
-            <span class="data-label">${label}</span>
-            <span class="data-value ${type}">${value}</span>`;
-        reportContent.appendChild(item);
-    };
-
-    const setupCategories = () => {
-        const categories = document.querySelectorAll('.category-list li');
-        const reportTitle = document.getElementById('report-title');
-
-        const filterInfos = (category) => {
-            const allItems = document.querySelectorAll('.data-item');
-            let delay = 0;
-            allItems.forEach(item => {
-                item.classList.remove('visible');
-                if (item.dataset.category === category) {
-                    setTimeout(() => {
-                        item.style.display = 'block';
-                        setTimeout(() => item.classList.add('visible'), 50 + delay * 70);
-                    }, delay * 80);
-                    delay++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            const activeCat = document.querySelector(`#cat-${category}`);
-            if (activeCat) reportTitle.textContent = activeCat.textContent;
-        };
-
-        categories.forEach(cat => {
-            cat.addEventListener('click', () => {
-                categories.forEach(c => c.classList.remove('active'));
-                cat.classList.add('active');
-                const categoryId = cat.id.replace('cat-', '');
-                filterInfos(categoryId);
-            });
-        });
-
-        filterInfos('computer');
-    };
-
-    const getOS = () => {
-        const ua = navigator.userAgent;
-        if (/android/i.test(ua)) return "Android";
-        if (/iPad|iPhone|iPod/.test(ua)) return "iOS";
-        if (/linux/i.test(ua)) return "Linux";
-        if (/macintosh|mac os x/i.test(ua)) return "macOS";
-        if (/windows|win32/i.test(ua)) return "Windows";
-        return navigator.platform;
-    };
-
-    const getGpuInfo = () => {
-        try {
-            const gl = document.createElement('canvas').getContext('webgl');
-            const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            return rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Unavailable';
-        } catch { return 'Unavailable'; }
-    };
-
-    const gatherData = async () => {
-        addInfo('computer', 'Operating System', getOS(), 'danger');
-        addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
-        if (navigator.deviceMemory)
-            addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
-        addInfo('computer', 'GPU', getGpuInfo(), 'danger');
-
-        try {
-            const battery = await navigator.getBattery();
-            addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
-        } catch {}
-
-        try {
-            const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
-            addInfo('network', 'Public IP', ipData.ip, 'danger');
-        } catch {}
-
-        addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
-        addInfo('browser', 'Languages', navigator.languages.join(', '));
-        addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height}`);
-        addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-    };
-
-    gatherData().then(() => setupCategories());
-});
+document.addEventListener('DOMContentLoaded',()=>{const reportContent=document.getElementById('report-content');const reportTitle=document.getElementById('report-title');const refreshBtn=document.getElementById('refreshBtn');const copyBtn=document.getElementById('copyBtn');let collected={computer:{},network:{},browser:{}};const addInfo=(category,label,value,type='')=>{const item=document.createElement('div');item.className='data-item';item.dataset.category=category;item.innerHTML=`<div class="data-label">${label}</div><div class="data-value ${type}">${value}</div>`;reportContent.appendChild(item);return item};const clearInfos=()=>{reportContent.innerHTML=''};const setupCategories=()=>{const cats=document.querySelectorAll('.category-list li');const filter=(cat)=>{const items=document.querySelectorAll('.data-item');let delay=0;items.forEach(it=>{it.classList.remove('visible');if(it.dataset.category===cat){it.style.display='block';setTimeout(()=>{it.classList.add('visible')},50+delay*70);delay++}else{it.style.display='none'}});const active=document.querySelector(`#cat-${cat}`);if(active)reportTitle.textContent=active.textContent};cats.forEach(c=>{c.addEventListener('click',()=>{cats.forEach(x=>x.classList.remove('active'));c.classList.add('active');filter(c.id.replace('cat-',''))})});filter('computer')};const getOS=()=>{const ua=navigator.userAgent;if(/android/i.test(ua))return'Android';if(/iPad|iPhone|iPod/.test(ua)&&!window.MSStream)return'iOS';if(/linux/i.test(ua))return'Linux';if(/macintosh|mac os x/i.test(ua))return'macOS';if(/windows|win32/i.test(ua))return'Windows';return navigator.platform||'Unknown'};const getGpuInfo=()=>{try{const c=document.createElement('canvas');const gl=c.getContext('webgl')||c.getContext('experimental-webgl');if(!gl)return'Unavailable';const ext=gl.getExtension('WEBGL_debug_renderer_info');if(ext){return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)+' — '+gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)}return'Unavailable'}catch(e){return'Unavailable'}};const getWebglRenderer=()=>{try{const c=document.createElement('canvas');const gl=c.getContext('webgl2')||c.getContext('webgl');if(!gl)return null;const ext=gl.getExtension('WEBGL_debug_renderer_info');if(!ext)return null;return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)}catch(e){return null}};const getCanvasFingerprint=()=>{try{const c=document.createElement('canvas');const ctx=c.getContext('2d');ctx.textBaseline='top';ctx.font='14px Roboto Mono';ctx.fillStyle='#f60';ctx.fillRect(125,1,62,20);ctx.fillStyle='#069';ctx.fillText('BrowserFingerprint',2,15);ctx.fillStyle='rgba(102,204,0,0.7)';ctx.fillText('FingerprintTest',4,17);return c.toDataURL()}catch(e){return'Unavailable'}};const getLocalIp=()=>new Promise(resolve=>{let ips=[];try{const pc=new RTCPeerConnection({iceServers:[]});pc.createDataChannel('');pc.createOffer().then(offer=>pc.setLocalDescription(offer)).catch(()=>{});pc.onicecandidate=e=>{if(!e||!e.candidate)return;const m=/([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate);if(m){ips.push(m[1]);pc.onicecandidate=null;try{pc.close()}catch(e){}resolve(Array.from(new Set(ips)).join(', '))}};setTimeout(()=>resolve('Unavailable'),2500)}catch(e){resolve('Unavailable')}});const getBatteryInfo=async()=>{try{if(navigator.getBattery){const b=await navigator.getBattery();return{level:Math.round(b.level*100)+'%',charging:b.charging}}return null}catch(e){return null}};const enumerateMedia=async()=>{try{if(!navigator.mediaDevices||!navigator.mediaDevices.enumerateDevices)return[];const dev=await navigator.mediaDevices.enumerateDevices();return dev.map(d=>({kind:d.kind,label:d.label||'Hidden',id:d.deviceId}))}catch(e){return[]}};const getStorageEstimate=async()=>{try{if(navigator.storage&&navigator.storage.estimate){const est=await navigator.storage.estimate();return est}return null}catch(e){return null}};const getPerformanceInfo=()=>{try{const p=performance;const nav=navigator;const memory=p.memory||null;const entries=p.getEntriesByType('navigation')||[];const navTiming=entries[0]||p.timing||null;return{timing:navTiming,memory:memory,now:p.now()}}catch(e){return{}}};const gatherAll=async()=>{clearInfos();collected={computer:{},network:{},browser:{}};const os=getOS();collected.computer.os=os;addInfo('computer','Operating System',os,'');const cores=navigator.hardwareConcurrency||'Unknown';collected.computer.cores=cores;addInfo('computer','CPU Cores',cores,'');const devMem=navigator.deviceMemory||'Unknown';collected.computer.memory_est=devMem;addInfo('computer','Device Memory (GB)',devMem,'warning');const gpu=getGpuInfo();collected.computer.gpu=gpu;addInfo('computer','GPU',gpu,'');const webgl=getWebglRenderer()||'Unavailable';collected.computer.webgl_renderer=webgl;addInfo('computer','WebGL Renderer',webgl,'');const canvasFp=getCanvasFingerprint();collected.computer.canvas_fp=canvasFp;addInfo('computer','Canvas Fingerprint (dataURL...)',canvasFp?.slice(0,120)+'...','');const batt=await getBatteryInfo();if(batt){collected.computer.battery=batt;addInfo('computer','Battery',`${batt.level} ${batt.charging? ' (Charging)': ''}`,'')}else{addInfo('computer','Battery','Unavailable','warning')}try{const media=await enumerateMedia();collected.computer.media_devices=media;addInfo('computer','Media Devices',media.length?media.map(m=>m.kind+': '+m.label).join('; '):'None','')}catch(e){addInfo('computer','Media Devices','Unavailable','warning')}try{const sw=!!navigator.serviceWorker;collected.computer.serviceWorker=sw;addInfo('computer','Service Worker Support',sw?'Yes':'No','')}catch(e){}const perf=getPerformanceInfo();collected.computer.performance=perf;addInfo('computer','Performance Now (ms)',Math.round(perf.now||0),'');if(perf.memory)addInfo('computer','JS Heap (approx)',`${Math.round(perf.memory.usedJSHeapSize/1024/1024)}MB used / ${Math.round(perf.memory.jsHeapSizeLimit/1024/1024)}MB limit`,'');try{const fonts=(()=>{const list=['Arial','Verdana','Helvetica','Times New Roman','Courier New','Georgia','Palatino','Garamond','Comic Sans MS','Segoe UI','Consolas','Trebuchet MS','Impact'];const found=[];const span=document.createElement('span');span.textContent='wiwiwiwi';span.style.fontSize='16px';span.style.visibility='hidden';document.body.appendChild(span);for(const f of list){span.style.fontFamily='monospace';const monoW=span.offsetWidth;span.style.fontFamily=`${f}, monospace`;const w=span.offsetWidth; if(monoW!==w)found.push(f)}document.body.removeChild(span);return found})();collected.computer.fonts=fonts;addInfo('computer','Detected Fonts',fonts.length?fonts.join(', '):'Unknown','warning')}catch(e){}const localIp=await getLocalIp();collected.network.local_ip=localIp;addInfo('network','Local IP',localIp,'danger');try{const ipResp=await fetch('https://api.ipify.org?format=json');const ipJson=await ipResp.json();const pubIp=ipJson.ip||'Unavailable';collected.network.public_ip=pubIp;addInfo('network','Public IP',pubIp,'danger');try{const locResp=await fetch(`https://ipapi.co/${pubIp}/json/`);const locJson=await locResp.json();collected.network.isp=locJson.org||'Unknown';collected.network.city=locJson.city||'';collected.network.country=locJson.country_name||'';collected.network.timezone=locJson.timezone||'';addInfo('network','ISP',locJson.org||'Unknown','warning');addInfo('network','Location',`${locJson.city||'Unknown'}, ${locJson.country_name||'Unknown'}`,'');if(locJson.timezone&&locJson.timezone!==Intl.DateTimeFormat().resolvedOptions().timeZone){addInfo('network','Timezone Mismatch','Possible VPN/Proxy','warning')}}catch(e){} }catch(e){addInfo('network','Public IP','Unavailable','warning')}if(navigator.connection){try{const nc=navigator.connection;collected.network.connection={effectiveType:nc.effectiveType,downlink:nc.downlink,rtt:nc.rtt};addInfo('network','Connection Type',navigator.connection.effectiveType||'Unknown','');addInfo('network','Downlink (Mbps)',navigator.connection.downlink||'Unknown','');addInfo('network','RTT (ms)',navigator.connection.rtt||'Unknown','')}catch(e){}}try{await new Promise(res=>navigator.geolocation.getCurrentPosition(p=>{collected.network.geolocation={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy};addInfo('network','Geolocation',`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)} (±${p.coords.accuracy}m)`,'danger');res()},err=>{addInfo('network','Geolocation','Denied or Unavailable','warning');res()},{enableHighAccuracy:true,timeout:5000,maximumAge:0}))}catch(e){addInfo('network','Geolocation','Unavailable','warning')}collected.browser.userAgent=navigator.userAgent;addInfo('browser','User Agent',navigator.userAgent,'danger');collected.browser.languages=navigator.languages||[navigator.language];addInfo('browser','Languages',(navigator.languages||[navigator.language]).join(', '),'');addInfo('browser','Platform',navigator.platform||'Unknown','');addInfo('browser','Vendor',navigator.vendor||'Unknown','');addInfo('browser','Cookies Enabled',navigator.cookieEnabled?'Yes':'No','');addInfo('browser','Do Not Track',navigator.doNotTrack||navigator.msDoNotTrack||'unspecified','');if(navigator.plugins&&navigator.plugins.length){const plugins=Array.from(navigator.plugins).map(p=>p.name).join(', ');collected.browser.plugins=plugins;addInfo('browser','Plugins',plugins,'warning')}else{addInfo('browser','Plugins','None or Hidden','warning')}try{const se=await getStorageEstimate();if(se){collected.browser.storage_estimate=se;addInfo('browser','Storage Quota',se.quota?`${Math.round(se.quota/1024/1024)} MB`:'Unknown','');addInfo('browser','Storage Usage',se.usage?`${Math.round(se.usage/1024/1024)} MB`:'Unknown','')}}catch(e){}try{const perfNav=performance.getEntriesByType('navigation')[0]||performance.timing;const navJson={loadTime:performance.timing?performance.timing.loadEventEnd-performance.timing.navigationStart:0};collected.browser.performance=navJson;addInfo('browser','Navigation Load Time (ms)',navJson.loadTime||0,'')}catch(e){}addInfo('browser','Screen',`${screen.width}x${screen.height} @ ${screen.colorDepth}bit`,'');addInfo('browser','Viewport',`${innerWidth}x${innerHeight}`,'');addInfo('browser','Timezone',Intl.DateTimeFormat().resolvedOptions().timeZone,'');addInfo('browser','Online',navigator.onLine?'Online':'Offline','');try{const storageKeys=Object.keys(localStorage||{}).slice(0,10);addInfo('browser','LocalStorage Keys',storageKeys.length?storageKeys.join(', '):'None','')}catch(e){addInfo('browser','LocalStorage','Unavailable','warning')}try{const sessKeys=Object.keys(sessionStorage||{}).slice(0,10);addInfo('browser','SessionStorage Keys',sessKeys.length?sessKeys.join(', '):'None','')}catch(e){addInfo('browser','SessionStorage','Unavailable','warning')}const collectedSnapshot=JSON.parse(JSON.stringify(collected));document.querySelectorAll('.data-item').forEach(el=>el.style.display='none');const nodes=document.querySelectorAll('.data-item');nodes.forEach(n=>{const cat=n.dataset.category;const keyLabel=n.querySelector('.data-label').textContent;const val=n.querySelector('.data-value').textContent;});reportContent.querySelectorAll('.data-item').forEach(it=>it.style.display='block');setupCategories();collected=collectedSnapshot;window.__DASHBOARD_DATA=collectedSnapshot};setupCategories();gatherAll();refreshBtn.addEventListener('click',()=>{gatherAll()});copyBtn.addEventListener('click',()=>{try{const txt=JSON.stringify(window.__DASHBOARD_DATA||{},null,2);navigator.clipboard.writeText(txt);const original=copyBtn.textContent;copyBtn.textContent='Copied';setTimeout(()=>copyBtn.textContent=original,1200)}catch(e){}});});
 </script>
-
 </body>
 </html>
