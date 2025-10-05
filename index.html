@@ -59,6 +59,8 @@ h2 {font-size: 1.4rem; color: var(--header-color); border-bottom: 1px solid var(
 .footer span {font-family: 'Roboto Mono', monospace; color: var(--value-color);}
 .footer .beta {display: block; margin-top: 0.5rem; font-weight: 600; color: var(--accent-color);}
 
+.watermark {position: fixed; top: 10px; right: 10px; color: var(--accent-color); font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 5px; z-index: 10000;}
+
 @media (max-width: 900px) {
     .dashboard-container {flex-direction: column; height: 60vh; max-height: none;}
     .sidebar {flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color);}
@@ -96,6 +98,8 @@ h2 {font-size: 1.4rem; color: var(--header-color); border-bottom: 1px solid var(
     <span class="beta">[BETA WEBSITE]</span>
 </div>
 
+<div class="watermark" id="watermark">FPS: 0 | MS: 0</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
@@ -103,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTimeEl = document.getElementById('current-time');
     const mouseCountEl = document.getElementById('mouse-count');
     const countryEl = document.getElementById('country');
+    const watermarkEl = document.getElementById('watermark');
 
     let mouseMovements = 0;
     const isWindows = /windows|win32/i.test(navigator.userAgent);
@@ -200,6 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCategories();
         setTimeout(() => loader.classList.add('hidden'), 800);
     });
+
+    // FPS / MS watermark
+    let lastFrame = performance.now();
+    let fps = 0;
+    function updateWatermark() {
+        const now = performance.now();
+        const delta = now - lastFrame;
+        fps = Math.round(1000/delta);
+        watermarkEl.textContent = `FPS: ${fps} | MS: ${delta.toFixed(1)}`;
+        lastFrame = now;
+        requestAnimationFrame(updateWatermark);
+    }
+    requestAnimationFrame(updateWatermark);
 });
 </script>
 
