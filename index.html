@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRITICAL_ERROR // PROTOCOL_BREACH</title>
+    <title>SYSTEM COMPROMISED // BREACH DETECTED</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glow-color: #ff3b3b; /* Zmieniono na czerwony dla groźniejszego efektu */
+            --glow-color: #ff3b3b;
             --danger-color: #ff4d4d;
             --warning-color: #ffcc00;
             --success-color: #00ffaa;
@@ -111,19 +111,19 @@
         .info-container {
             flex: 1.2;
             height: 100%;
-            overflow-y: auto;
+            overflow-y: auto; /* ZAPEWNIA SCROLLOWANIE */
             border-left: 1px solid var(--glow-color);
             padding: 15px;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(3px);
         }
         
-        .info-container::-webkit-scrollbar { width: 3px; }
+        .info-container::-webkit-scrollbar { width: 4px; }
         .info-container::-webkit-scrollbar-track { background: transparent; }
-        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); }
+        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); border-radius: 4px; }
 
         .info-item {
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             font-size: 12px;
             color: #a0a0a0;
             line-height: 1.5;
@@ -155,20 +155,20 @@
     <div class="layout-container">
         <div class="main-container">
             <div class="loading-circle" id="loadingCircle"></div>
-            <div class="loading-text hidden" id="loadingText">DOSTĘP NIEAUTORYZOWANY</div>
+            <div class="loading-text hidden" id="loadingText">ZŁAMANO ZABEZPIECZENIA</div>
             <div class="progress-container hidden" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <div class="timer hidden" id="timer">KOŃCZENIE SESJI ZA: <span id="timeLeft">30</span>s</div>
+            <div class="timer hidden" id="timer">SYSTEM SKOMPROMITOWANY. CZAS DO ZABLOKOWANIA: <span id="timeLeft">30</span>s</div>
         </div>
         <div class="info-container hidden" id="infoContainer"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 30; // BARDZO SZYBKO!
+            const TOTAL_TIME = 30;
             let timeLeft = TOTAL_TIME;
-            const REDIRECT_URL = 'https://www.google.com/search?q=jak+usunąć+wirusa+z+komputera'; // "Straszny" redirect
+            const REDIRECT_URL = 'https://www.google.com/search?q=wezwij+pomoc+policyjną+atak+hakerski';
 
             const progressBar = document.getElementById('progressBar' );
             const timeLeftSpan = document.getElementById('timeLeft');
@@ -186,7 +186,7 @@
 
                     if (timeLeft <= 0) {
                         clearInterval(timerInterval);
-                        loadingText.textContent = "DOSTĘP UZYSKANY. LOGI ZAPISANE.";
+                        loadingText.textContent = "SYSTEM ZABLOKOWANY. LOGI PRZESŁANE.";
                         setTimeout(() => window.location.href = REDIRECT_URL, 2000);
                     }
                 }, 1000);
@@ -197,78 +197,74 @@
             let infoDelay = 0;
             function addInfoItem(label, value, type = '') {
                 const infoContainer = document.getElementById('infoContainer');
-                if (!infoContainer) return;
+                if (!infoContainer || !value) return;
                 const item = document.createElement('div');
                 item.className = `info-item ${type}`;
-                item.style.animationDelay = `${infoDelay * 30}ms`; // Szybsze pojawianie się
-                item.innerHTML = `${label}: <span class="info-value">${value || 'N/A'}</span>`;
+                item.style.animationDelay = `${infoDelay * 25}ms`; // Jeszcze szybsze pojawianie się
+                item.innerHTML = `${label}: <span class="info-value">${value}</span>`;
                 infoContainer.appendChild(item);
                 infoDelay++;
             }
 
             async function gatherAndDisplayInfo() {
-                addInfoItem('STATUS', 'PRZEŁAMYWANIE ZABEZPIECZEŃ...', 'warning');
+                addInfoItem('STATUS', 'KRYTYCZNY BŁĄD ZABEZPIECZEŃ', 'danger');
                 
-                // --- LOKALNY ADRES IP (NAJGROŹNIEJSZE) ---
+                // --- DANE O KOMPUTERZE ---
+                addInfoItem('--- DANE O JEDNOSTCE ---', '--------------------', 'warning');
+                addInfoItem('SYSTEM OPERACYJNY', navigator.platform, 'danger');
+                if (navigator.cpuArchitecture) addInfoItem('ARCHITEKTURA CPU', navigator.cpuArchitecture, 'danger');
+                addInfoItem('RDZENIE LOGICZNE CPU', navigator.hardwareConcurrency, 'danger');
+                if (navigator.deviceMemory) addInfoItem('PAMIĘĆ RAM (szacowana)', `${navigator.deviceMemory} GB`, 'danger');
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    const gpu = rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Maskowana';
+                    addInfoItem('KARTA GRAFICZNA (GPU)', gpu, 'danger');
+                } catch (e) {}
+                try {
+                    const battery = await navigator.getBattery();
+                    addInfoItem('POZIOM BATERII', `${(battery.level * 100).toFixed(0)}%`, 'warning');
+                    addInfoItem('STATUS ŁADOWANIA', battery.charging ? 'Podłączono (Monitorowanie aktywne)' : 'Odłączono', 'warning');
+                } catch (e) {}
+
+                // --- DANE O INTERNECIE I SIECI ---
+                addInfoItem('--- DANE SIECIOWE ---', '--------------------', 'warning');
                 try {
                     const pc = new RTCPeerConnection({iceServers:[]});
                     pc.createDataChannel('');
                     pc.createOffer().then(pc.setLocalDescription.bind(pc));
                     pc.onicecandidate = (ice) => {
-                        if (!ice || !ice.candidate || !ice.candidate.candidate) return;
-                        const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate)[1];
-                        addInfoItem('LOKALNY ADRES IP SIECI', ip, 'danger');
-                        pc.onicecandidate = null;
+                        if (ice && ice.candidate && ice.candidate.candidate) {
+                            const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate)[1];
+                            addInfoItem('LOKALNY ADRES IP', ip, 'danger');
+                            pc.onicecandidate = null;
+                        }
                     };
-                } catch (e) { addInfoItem('LOKALNY ADRES IP', 'Ukryty (WebRTC zablokowane)', 'success'); }
-
-                // --- PUBLICZNY ADRES IP ---
+                } catch (e) {}
                 try {
-                    const ipResponse = await fetch('https://api.ipify.org?format=json' );
-                    const ipData = await ipResponse.json();
+                    const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
                     addInfoItem('PUBLICZNY ADRES IP', ipData.ip, 'danger');
                     const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
                     addInfoItem('DOSTAWCA INTERNETU', locData.org, 'warning');
                     addInfoItem('LOKALIZACJA (GEO-IP)', `${locData.city}, ${locData.country_name}`, 'danger');
                     addInfoItem('KOORDYNATY (GPS)', `${locData.latitude}, ${locData.longitude}`, 'danger');
-                } catch (e) { addInfoItem('PUBLICZNY ADRES IP', 'Błąd namierzania', 'warning'); }
+                } catch (e) {}
+                if (navigator.connection) {
+                    addInfoItem('TYP POŁĄCZENIA', navigator.connection.effectiveType, 'warning');
+                    addInfoItem('PRĘDKOŚĆ (szacowana)', `${navigator.connection.downlink} Mbps`, 'warning');
+                    addInfoItem('PING (RTT)', `${navigator.connection.rtt} ms`, 'warning');
+                }
 
-                // --- DANE SYSTEMOWE I SPRZĘTOWE ---
-                addInfoItem('SYSTEM OPERACYJNY', navigator.platform, 'warning');
-                addInfoItem('RDZENIE PROCESORA', navigator.hardwareConcurrency, 'warning');
-                if (navigator.deviceMemory) addInfoItem('PAMIĘĆ RAM', `${navigator.deviceMemory} GB`, 'warning');
-                
-                // --- DANE PRZEGLĄDARKI ---
-                addInfoItem('PRZEGLĄDARKA', navigator.userAgent, 'danger');
+                // --- DANE O PRZEGLĄDARCE (FINGERPRINTING) ---
+                addInfoItem('--- ODCISK CYFROWY ---', '--------------------', 'warning');
+                addInfoItem('PRZEGLĄDARKA (USER AGENT)', navigator.userAgent, 'danger');
                 addInfoItem('JĘZYK', navigator.language);
                 addInfoItem('COOKIES', navigator.cookieEnabled ? 'Włączone (Śledzenie aktywne)' : 'Wyłączone', 'danger');
+                addInfoItem('ROZDZIELCZOŚĆ EKRANU', `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`, 'danger');
+                addInfoItem('ORIENTACJA EKRANU', screen.orientation.type, 'danger');
                 
-                // --- ODCISKI PALCA (FINGERPRINTING) ---
-                try {
-                    const canvas = document.createElement('canvas');
-                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                    const renderer = gl.getExtension('WEBGL_debug_renderer_info')?.UNMASKED_RENDERER_WEBGL;
-                    addInfoItem('KARTA GRAFICZNA (GPU)', gl.getParameter(renderer), 'danger');
-                } catch (e) { addInfoItem('KARTA GRAFICZNA', 'Maskowana', 'warning'); }
-                
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    addInfoItem('ODCISK PALCA AUDIO', 'Wygenerowano unikalny hash', 'danger');
-                    audioContext.close();
-                } catch (e) {}
-
-                // --- BATERIA I CZUJNIKI ---
-                try {
-                    const battery = await navigator.getBattery();
-                    addInfoItem('POZIOM BATERII', `${(battery.level * 100).toFixed(0)}%`, battery.level < 0.2 ? 'danger' : 'warning');
-                    addInfoItem('STATUS ŁADOWANIA', battery.charging ? 'Podłączono (Monitorowanie aktywne)' : 'Odłączono', 'warning');
-                } catch (e) {}
-
-                if ('DeviceMotionEvent' in window) {
-                    addInfoItem('AKCELEROMETR', 'Wykryto, odczytuję dane...', 'danger');
-                }
-                
-                addInfoItem('PODSUMOWANIE', 'Ustalono tożsamość cyfrową.', 'danger');
+                addInfoItem('PODSUMOWANIE', 'SYSTEM W PEŁNI SKOMPROMITOWANY', 'danger');
             }
 
             init();
