@@ -18,6 +18,7 @@
             --value-color: #58a6ff;
             --danger-color: #ff4d4d;
             --warning-color: #ffc107;
+            --accent-color: #58a6ff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 14px; }
@@ -47,20 +48,19 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         
         .sidebar {
-            flex: 0 0 300px;
+            flex: 0 0 280px;
             background: linear-gradient(180deg, #1a1a1a, #141414);
             padding: 2rem;
             border-right: 1px solid var(--border-color);
-            overflow-y: auto;
         }
         .main-content {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
         }
-        .sidebar::-webkit-scrollbar, .main-content::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track, .main-content::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb, .main-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .main-content::-webkit-scrollbar { width: 4px; }
+        .main-content::-webkit-scrollbar-track { background: transparent; }
+        .main-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
         h1, h2 {
             font-family: 'Inter', sans-serif;
@@ -72,13 +72,31 @@
         h1 { font-size: 1.5rem; text-align: center; }
         h2 { font-size: 1.2rem; }
 
+        .category-list { list-style: none; }
+        .category-list li {
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            font-weight: 500;
+        }
+        .category-list li:hover { background-color: var(--border-color); }
+        .category-list li.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            font-weight: 700;
+        }
+
         .data-item {
             margin-bottom: 1rem;
             font-size: 1rem;
             word-break: break-word;
             animation: itemFadeIn 0.5s ease-out forwards;
             opacity: 0;
+            display: none; /* Hidden by default */
         }
+        .data-item.visible { display: block; }
         @keyframes itemFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         
         .data-label {
@@ -98,6 +116,7 @@
             body { padding: 0; }
             .dashboard-container { flex-direction: column; height: 100vh; max-height: none; border-radius: 0; }
             .sidebar { flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .category-list { display: flex; justify-content: center; gap: 0.5rem; }
             .main-content { flex: 1; }
         }
     </style>
@@ -105,27 +124,58 @@
 <body>
     <div class="dashboard-container">
         <div class="sidebar">
-            <h1>Key Identifiers</h1>
-            <div id="key-info"></div>
+            <h1>Categories</h1>
+            <ul class="category-list">
+                <li id="cat-computer" class="active">Computer Info</li>
+                <li id="cat-network">Network Info</li>
+                <li id="cat-browser">Browser Info</li>
+            </ul>
         </div>
         <div class="main-content">
-            <h1>Full System & Network Report</h1>
-            <div id="full-report"></div>
+            <h2 id="report-title">Infos</h2>
+            <div id="report-content"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            let delay = 0;
-            const addInfo = (containerId, label, value, type = '') => {
+            const addInfo = (category, label, value, type = '') => {
                 if (!value && typeof value !== 'number') value = 'N/A';
-                const container = document.getElementById(containerId);
+                const container = document.getElementById('report-content');
                 const item = document.createElement('div');
                 item.className = 'data-item';
-                item.style.animationDelay = `${delay * 50}ms`;
+                item.dataset.category = category; // Assign category
                 item.innerHTML = `<span class="data-label">${label}</span><span class="data-value ${type}">${value}</span>`;
                 container.appendChild(item);
-                delay++;
+            };
+
+            const setupCategories = () => {
+                const categories = document.querySelectorAll('.category-list li');
+                const reportTitle = document.getElementById('report-title');
+
+                const filterInfos = (category) => {
+                    const allItems = document.querySelectorAll('.data-item');
+                    allItems.forEach(item => {
+                        if (item.dataset.category === category) {
+                            item.classList.add('visible');
+                        } else {
+                            item.classList.remove('visible');
+                        }
+                    });
+                    const activeCat = document.querySelector(`[id="cat-${category}"]`);
+                    reportTitle.textContent = activeCat.textContent;
+                };
+
+                categories.forEach(cat => {
+                    cat.addEventListener('click', () => {
+                        categories.forEach(c => c.classList.remove('active'));
+                        cat.classList.add('active');
+                        const categoryId = cat.id.replace('cat-', '');
+                        filterInfos(categoryId);
+                    });
+                });
+
+                filterInfos('computer'); // Show first category by default
             };
 
             const getOS = () => {
@@ -154,7 +204,7 @@
                     pc.onicecandidate = e => {
                         if (e.candidate) {
                             const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
-                            if (ip) addInfo('key-info', 'Local IP', ip, 'danger');
+                            if (ip) addInfo('network', 'Local IP', ip, 'danger');
                             pc.onicecandidate = null;
                         }
                     };
@@ -162,97 +212,78 @@
             };
 
             const getFontFingerprint = () => {
-                const baseFonts = ['monospace', 'sans-serif', 'serif'];
-                const testString = "mmmmmmmmmmlli";
-                const testSize = '72px';
-                const h = document.body;
-                const s = document.createElement("span");
-                s.style.fontSize = testSize;
-                s.innerHTML = testString;
-                const defaultWidth = {};
-                for (let baseFont of baseFonts) {
-                    s.style.fontFamily = baseFont;
-                    h.appendChild(s);
-                    defaultWidth[baseFont] = s.offsetWidth;
-                    h.removeChild(s);
-                }
-                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact', 'Calibri', 'Candara', 'Segoe UI', 'Consolas', 'Cambria', 'Constantia', 'Corbel'];
+                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact', 'Calibri', 'Candara', 'Segoe UI', 'Consolas', 'Cambria'];
                 const detected = fontList.filter(font => {
-                    for (let baseFont of baseFonts) {
-                        s.style.fontFamily = font + ',' + baseFont;
-                        h.appendChild(s);
-                        const matched = s.offsetWidth !== defaultWidth[baseFont];
-                        h.removeChild(s);
-                        if (matched) return true;
-                    }
-                    return false;
+                    const testSpan = document.createElement('span');
+                    testSpan.style.fontFamily = 'monospace';
+                    testSpan.textContent = 'wiwiwiwi';
+                    document.body.appendChild(testSpan);
+                    const monoWidth = testSpan.offsetWidth;
+                    testSpan.style.fontFamily = font + ',monospace';
+                    const fontWidth = testSpan.offsetWidth;
+                    document.body.removeChild(testSpan);
+                    return monoWidth !== fontWidth;
                 });
-                addInfo('full-report', 'Detected Fonts', detected.join(', '), 'warning');
+                addInfo('browser', 'Detected Fonts', detected.join(', '), 'warning');
             };
 
             // --- Start Gathering Data ---
             
-            // Key Info (Sidebar)
-            addInfo('key-info', 'Operating System', getOS(), 'danger');
-            try {
-                const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
-                addInfo('key-info', 'Public IP', ipData.ip, 'danger');
-                const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
-                addInfo('key-info', 'Location', `${locData.city}, ${locData.country_name}`, 'danger');
-                if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
-                    addInfo('key-info', 'VPN/Proxy', 'Detected', 'danger');
-                }
-            } catch (e) {}
-            getLocalIp();
-            addInfo('key-info', 'GPU', getGpuInfo(), 'danger');
-
-            // Full Report (Main Content)
-            addInfo('full-report', 'User Agent', navigator.userAgent, 'danger');
-            addInfo('full-report', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
-            if (navigator.deviceMemory) addInfo('full-report', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
-            
-            if (navigator.connection) {
-                addInfo('full-report', 'Connection Type', navigator.connection.effectiveType);
-                addInfo('full-report', 'Downlink Speed', `${navigator.connection.downlink} Mbps`);
-                addInfo('full-report', 'Round-Trip Time', `${navigator.connection.rtt} ms`);
-            }
-
-            addInfo('full-report', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
-            addInfo('full-report', 'Languages', navigator.languages.join(', '));
-            addInfo('full-report', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-            addInfo('full-report', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'danger');
-            
+            // Computer Info
+            addInfo('computer', 'Operating System', getOS(), 'danger');
+            addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
+            if (navigator.deviceMemory) addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
+            addInfo('computer', 'GPU', getGpuInfo(), 'danger');
             try {
                 const battery = await navigator.getBattery();
-                addInfo('full-report', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
+                addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
             } catch (e) {}
-
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
-                const media = devices.filter(d => d.label).map(d => `${d.kind}: ${d.label.substring(0,30)}...`).join('  
+                const media = devices.filter(d => d.label).map(d => `${d.kind.replace('input', '')}: ${d.label.substring(0,30)}...`).join('  
 ');
-                if (media) addInfo('full-report', 'Media Devices', media, 'danger');
+                if (media) addInfo('computer', 'Media Devices', media, 'danger');
             } catch (e) {}
 
-            if (navigator.plugins) {
-                const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
-                if (plugins) addInfo('full-report', 'Browser Plugins', plugins, 'warning');
+            // Network Info
+            getLocalIp();
+            try {
+                const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
+                addInfo('network', 'Public IP', ipData.ip, 'danger');
+                const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
+                addInfo('network', 'ISP', locData.org, 'warning');
+                addInfo('network', 'Location', `${locData.city}, ${locData.country_name}`, 'danger');
+                if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
+                    addInfo('network', 'VPN/Proxy', 'Detected', 'danger');
+                }
+            } catch (e) {}
+            if (navigator.connection) {
+                addInfo('network', 'Connection Type', navigator.connection.effectiveType);
+                addInfo('network', 'Downlink Speed', `${navigator.connection.downlink} Mbps`);
             }
-
-            getFontFingerprint();
-
-            // Geolocation with REAL permission prompt
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    addInfo('key-info', 'Precise GPS', `Access Granted`, 'danger');
-                    addInfo('full-report', 'GPS Coordinates', `${pos.coords.latitude}, ${pos.coords.longitude}`, 'danger');
-                    addInfo('full-report', 'GPS Accuracy', `${pos.coords.accuracy} meters`, 'danger');
+                    addInfo('network', 'Precise GPS', `${pos.coords.latitude}, ${pos.coords.longitude} (acc: ${pos.coords.accuracy}m)`, 'danger');
                 },
                 (err) => {
-                    addInfo('key-info', 'Precise GPS', 'Access Denied', 'warning');
-                },
-                { enableHighAccuracy: true }
+                    addInfo('network', 'Precise GPS', 'Access Denied', 'warning');
+                }, { enableHighAccuracy: true }
             );
+
+            // Browser Info
+            addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
+            addInfo('browser', 'Languages', navigator.languages.join(', '));
+            addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
+            addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            addInfo('browser', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'danger');
+            if (navigator.plugins) {
+                const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
+                if (plugins) addInfo('browser', 'Browser Plugins', plugins, 'warning');
+            }
+            getFontFingerprint();
+
+            // --- Setup UI ---
+            setupCategories();
         });
     </script>
 </body>
