@@ -78,7 +78,7 @@
             margin-bottom: 0.5rem;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.3s ease;
             font-weight: 500;
         }
         .category-list li:hover { background-color: var(--border-color); }
@@ -86,6 +86,12 @@
             background-color: var(--accent-color);
             color: #ffffff;
             font-weight: 700;
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.5);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(88, 166, 255, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(88, 166, 255, 0.7); }
         }
 
         .data-item {
@@ -94,7 +100,7 @@
             word-break: break-word;
             animation: itemFadeIn 0.5s ease-out forwards;
             opacity: 0;
-            display: none; /* Hidden by default */
+            display: none;
         }
         .data-item.visible { display: block; }
         @keyframes itemFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
@@ -139,14 +145,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            const reportContent = document.getElementById('report-content');
+            
             const addInfo = (category, label, value, type = '') => {
                 if (!value && typeof value !== 'number') value = 'N/A';
-                const container = document.getElementById('report-content');
                 const item = document.createElement('div');
                 item.className = 'data-item';
-                item.dataset.category = category; // Assign category
+                item.dataset.category = category;
                 item.innerHTML = `<span class="data-label">${label}</span><span class="data-value ${type}">${value}</span>`;
-                container.appendChild(item);
+                reportContent.appendChild(item);
             };
 
             const setupCategories = () => {
@@ -155,9 +162,12 @@
 
                 const filterInfos = (category) => {
                     const allItems = document.querySelectorAll('.data-item');
+                    let delay = 0;
                     allItems.forEach(item => {
                         if (item.dataset.category === category) {
                             item.classList.add('visible');
+                            item.style.animationDelay = `${delay * 50}ms`;
+                            delay++;
                         } else {
                             item.classList.remove('visible');
                         }
@@ -175,7 +185,7 @@
                     });
                 });
 
-                filterInfos('computer'); // Show first category by default
+                filterInfos('computer');
             };
 
             const getOS = () => {
@@ -227,9 +237,6 @@
                 addInfo('browser', 'Detected Fonts', detected.join(', '), 'warning');
             };
 
-            // --- Start Gathering Data ---
-            
-            // Computer Info
             addInfo('computer', 'Operating System', getOS(), 'danger');
             addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
             if (navigator.deviceMemory) addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
@@ -245,7 +252,6 @@
                 if (media) addInfo('computer', 'Media Devices', media, 'danger');
             } catch (e) {}
 
-            // Network Info
             getLocalIp();
             try {
                 const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
@@ -270,7 +276,6 @@
                 }, { enableHighAccuracy: true }
             );
 
-            // Browser Info
             addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
             addInfo('browser', 'Languages', navigator.languages.join(', '));
             addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
@@ -282,7 +287,6 @@
             }
             getFontFingerprint();
 
-            // --- Setup UI ---
             setupCategories();
         });
     </script>
