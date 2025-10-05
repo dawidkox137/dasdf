@@ -3,117 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System & Network Analysis</title>
+    <title>System Analysis Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121212;
+            --bg-color: #0a0a0a;
+            --surface-color: #141414;
+            --border-color: #2a2a2a;
             --text-color: #e0e0e0;
             --header-color: #ffffff;
-            --label-color: #bbbbbb;
-            --value-color: #4db8ff;
+            --label-color: #888888;
+            --value-color: #58a6ff;
             --danger-color: #ff4d4d;
-            --border-color: #333333;
+            --warning-color: #ffc107;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 14px; }
         body {
             background-color: var(--bg-color );
             color: var(--text-color);
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 2rem;
         }
-        .report-container {
-            width: 100%;
-            max-width: 800px;
-            background: #1e1e1e;
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            animation: fadeIn 1s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        h1 {
-            text-align: center;
-            color: var(--header-color);
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-        }
-        .data-section {
-            margin-bottom: 2rem;
-        }
-        .data-section h2 {
-            color: var(--header-color);
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        .data-item {
+        .dashboard-container {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.8rem;
-            font-size: 1rem;
-            word-break: break-all;
+            width: 100%;
+            max-width: 1200px;
+            height: 80vh;
+            max-height: 800px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-out;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        
+        .sidebar {
+            flex: 0 0 300px;
+            background: linear-gradient(180deg, #1a1a1a, #141414);
+            padding: 2rem;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .sidebar::-webkit-scrollbar, .main-content::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track, .main-content::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb, .main-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        h1, h2 {
+            font-family: 'Inter', sans-serif;
+            color: var(--header-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 { font-size: 1.5rem; text-align: center; }
+        h2 { font-size: 1.2rem; }
+
+        .data-item {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            word-break: break-word;
+            animation: itemFadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes itemFadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        
         .data-label {
+            display: block;
             color: var(--label-color);
-            padding-right: 1rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
         }
         .data-value {
+            font-family: 'Roboto Mono', monospace;
             color: var(--value-color);
-            text-align: right;
         }
-        .data-value.danger {
-            color: var(--danger-color);
-            font-weight: 700;
-        }
-        @media (max-width: 600px) {
-            html { font-size: 12px; }
-            body { padding: 1rem; }
-            .report-container { padding: 1.5rem; }
-            .data-item { flex-direction: column; align-items: flex-start; }
-            .data-value { text-align: left; margin-top: 0.2rem; }
+        .data-value.danger { color: var(--danger-color); font-weight: 700; }
+        .data-value.warning { color: var(--warning-color); }
+
+        @media (max-width: 900px) {
+            body { padding: 0; }
+            .dashboard-container { flex-direction: column; height: 100vh; max-height: none; border-radius: 0; }
+            .sidebar { flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .main-content { flex: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="report-container">
-        <h1>System & Network Analysis Report</h1>
-
-        <div class="data-section" id="network-info">
-            <h2>Network Information</h2>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <h1>Key Identifiers</h1>
+            <div id="key-info"></div>
         </div>
-
-        <div class="data-section" id="device-info">
-            <h2>Device Information</h2>
-        </div>
-
-        <div class="data-section" id="browser-details">
-            <h2>Browser Details</h2>
-        </div>
-
-        <div class="data-section" id="access-details">
-            <h2>Access Details</h2>
+        <div class="main-content">
+            <h1>Full System & Network Report</h1>
+            <div id="full-report"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const addInfo = (sectionId, label, value, type = '') => {
+            let delay = 0;
+            const addInfo = (containerId, label, value, type = '') => {
                 if (!value && typeof value !== 'number') value = 'N/A';
-                const section = document.getElementById(sectionId);
+                const container = document.getElementById(containerId);
                 const item = document.createElement('div');
                 item.className = 'data-item';
-                item.innerHTML = `<span class="data-label">${label}:</span><span class="data-value ${type}">${value}</span>`;
-                section.appendChild(item);
+                item.style.animationDelay = `${delay * 50}ms`;
+                item.innerHTML = `<span class="data-label">${label}</span><span class="data-value ${type}">${value}</span>`;
+                container.appendChild(item);
+                delay++;
             };
 
             const getOS = () => {
@@ -134,72 +146,92 @@
                 } catch (e) { return 'Unavailable'; }
             };
 
-            // --- Network Information ---
+            const getLocalIp = () => {
+                try {
+                    const pc = new RTCPeerConnection();
+                    pc.createDataChannel('');
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                    pc.onicecandidate = e => {
+                        if (e.candidate) {
+                            const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
+                            if (ip) addInfo('key-info', 'Local IP', ip, 'danger');
+                            pc.onicecandidate = null;
+                        }
+                    };
+                } catch (e) {}
+            };
+
+            const checkIncognito = async () => {
+                try {
+                    const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+                    if (!fs) return;
+                    fs(window.TEMPORARY, 100, () => addInfo('full-report', 'Incognito/Private Mode', 'No'), () => addInfo('full-report', 'Incognito/Private Mode', 'Detected', 'danger'));
+                } catch (e) {}
+            };
+
+            // --- Start Gathering Data ---
+            
+            // Key Info (Sidebar)
+            addInfo('key-info', 'Operating System', getOS(), 'danger');
             try {
                 const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
-                addInfo('network-info', 'IP Address', ipData.ip, 'danger');
+                addInfo('key-info', 'Public IP', ipData.ip, 'danger');
                 const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
-                addInfo('network-info', 'ISP', locData.org);
-                addInfo('network-info', 'Location', `${locData.city}, ${locData.region}, ${locData.country_name}`);
-                addInfo('network-info', 'Postal Code', locData.postal);
-            } catch (e) {
-                addInfo('network-info', 'IP Address', 'Unavailable');
-            }
+                addInfo('key-info', 'Location', `${locData.city}, ${locData.country_name}`, 'danger');
+                if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
+                    addInfo('key-info', 'VPN/Proxy', 'Detected', 'danger');
+                }
+            } catch (e) {}
+            getLocalIp();
+            addInfo('key-info', 'GPU', getGpuInfo(), 'danger');
+
+            // Full Report (Main Content)
+            addInfo('full-report', 'User Agent', navigator.userAgent, 'danger');
+            addInfo('full-report', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
+            if (navigator.deviceMemory) addInfo('full-report', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
+            
             if (navigator.connection) {
-                addInfo('network-info', 'Connection Type', navigator.connection.effectiveType);
-                addInfo('network-info', 'Connection Speed', `${navigator.connection.downlink} Mbps`);
+                addInfo('full-report', 'Connection Type', navigator.connection.effectiveType);
+                addInfo('full-report', 'Downlink Speed', `${navigator.connection.downlink} Mbps`);
+                addInfo('full-report', 'Round-Trip Time', `${navigator.connection.rtt} ms`);
             }
 
-            // --- Geolocation Data (with real permission request) ---
+            addInfo('full-report', 'Screen Resolution', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
+            addInfo('full-report', 'Languages', navigator.languages.join(', '));
+            addInfo('full-report', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            addInfo('full-report', 'Cookies Enabled', navigator.cookieEnabled ? 'Yes' : 'No', 'danger');
+            
+            try {
+                const battery = await navigator.getBattery();
+                addInfo('full-report', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
+            } catch (e) {}
+
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const media = devices.filter(d => d.label).map(d => `${d.kind}: ${d.label.substring(0,30)}...`).join('  
+');
+                if (media) addInfo('full-report', 'Media Devices', media, 'danger');
+            } catch (e) {}
+
+            if (navigator.plugins) {
+                const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
+                if (plugins) addInfo('full-report', 'Browser Plugins', plugins, 'warning');
+            }
+
+            checkIncognito();
+
+            // Geolocation with REAL permission prompt
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    addInfo('network-info', 'Precise Geolocation', `${pos.coords.latitude}, ${pos.coords.longitude}`, 'danger');
-                    addInfo('network-info', 'GPS Accuracy', `${pos.coords.accuracy} meters`, 'danger');
+                    addInfo('key-info', 'Precise GPS', `Access Granted`, 'danger');
+                    addInfo('full-report', 'GPS Coordinates', `${pos.coords.latitude}, ${pos.coords.longitude}`, 'danger');
+                    addInfo('full-report', 'GPS Accuracy', `${pos.coords.accuracy} meters`, 'danger');
                 },
                 (err) => {
-                    addInfo('network-info', 'Precise Geolocation', 'Access Denied', 'danger');
+                    addInfo('key-info', 'Precise GPS', 'Access Denied', 'warning');
                 },
                 { enableHighAccuracy: true }
             );
-
-            // --- Device Information ---
-            addInfo('device-info', 'Platform', getOS(), 'danger');
-            addInfo('device-info', 'Screen Resolution', `${screen.width}x${screen.height}`);
-            addInfo('device-info', 'Color Depth', `${screen.colorDepth}-bit`);
-            addInfo('device-info', 'CPU Cores', navigator.hardwareConcurrency);
-            if (navigator.deviceMemory) addInfo('device-info', 'Memory', `${navigator.deviceMemory}GB`);
-            addInfo('device-info', 'Touch Support', navigator.maxTouchPoints > 0 ? 'Yes' : 'No');
-            try {
-                const battery = await navigator.getBattery();
-                addInfo('device-info', 'Battery Level', `${(battery.level * 100).toFixed(0)}%`);
-                addInfo('device-info', 'Charging', battery.charging ? 'Yes' : 'No');
-            } catch (e) {}
-
-            // --- Browser Details ---
-            addInfo('browser-details', 'User Agent', navigator.userAgent);
-            addInfo('browser-details', 'Language', navigator.language);
-            addInfo('browser-details', 'Cookies', navigator.cookieEnabled ? 'Enabled' : 'Disabled');
-            addInfo('browser-details', 'Do Not Track', navigator.doNotTrack || 'Not Set');
-            addInfo('browser-details', 'WebGL Renderer', getGpuInfo());
-
-            // --- Access Details ---
-            addInfo('access-details', 'Referrer', document.referrer || 'Direct Access');
-            addInfo('access-details', 'Timestamp', new Date().toLocaleString());
-            addInfo('access-details', 'Page URL', window.location.href);
-            try {
-                localStorage.setItem('test', 'test');
-                localStorage.removeItem('test');
-                addInfo('access-details', 'Local Storage', 'Supported');
-            } catch (e) {
-                addInfo('access-details', 'Local Storage', 'Not Supported');
-            }
-            try {
-                sessionStorage.setItem('test', 'test');
-                sessionStorage.removeItem('test');
-                addInfo('access-details', 'Session Storage', 'Supported');
-            } catch (e) {
-                addInfo('access-details', 'Session Storage', 'Not Supported');
-            }
         });
     </script>
 </body>
