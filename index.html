@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,6 @@ body {
     overflow: hidden;
 }
 
-/* ----- Loader ----- */
 #loader {
     position: fixed;
     top: 0; left: 0;
@@ -48,7 +47,7 @@ body {
     justify-content: center;
     z-index: 9999;
     flex-direction: column;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
+    transition: opacity 1s ease, visibility 1s ease;
 }
 
 #loader.hidden {
@@ -57,12 +56,13 @@ body {
 }
 
 .loader-spinner {
-    border: 6px solid rgba(255,255,255,0.1);
-    border-top: 6px solid var(--accent-color);
+    width: 70px;
+    height: 70px;
+    border: 8px solid rgba(88,166,255,0.2);
+    border-top: 8px solid var(--accent-color);
     border-radius: 50%;
-    width: 60px; height: 60px;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+    animation: spin 1.4s linear infinite;
+    margin-bottom: 1.2rem;
 }
 
 @keyframes spin {
@@ -71,12 +71,18 @@ body {
 }
 
 .loader-text {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: var(--text-color);
     font-weight: 500;
+    letter-spacing: 1px;
+    animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* ----- Dashboard ----- */
+@keyframes pulse {
+    0%, 100% {opacity: 0.6;}
+    50% {opacity: 1;}
+}
+
 .dashboard-container {
     display: flex;
     width: 100%;
@@ -205,10 +211,9 @@ h2 {
 </head>
 <body>
 
-<!-- Loader -->
 <div id="loader">
     <div class="loader-spinner"></div>
-    <div class="loader-text">Ładowanie systemu...</div>
+    <div class="loader-text">Loading System...</div>
 </div>
 
 <div class="dashboard-container">
@@ -220,7 +225,6 @@ h2 {
             <li id="cat-browser">Browser Info</li>
         </ul>
     </div>
-
     <div class="main-content">
         <h2 id="report-title">Computer Info</h2>
         <div id="report-content"></div>
@@ -237,16 +241,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('div');
         item.className = 'data-item';
         item.dataset.category = category;
-        item.innerHTML = `
-            <span class="data-label">${label}</span>
-            <span class="data-value ${type}">${value}</span>`;
+        item.innerHTML = `<span class="data-label">${label}</span><span class="data-value ${type}">${value}</span>`;
         reportContent.appendChild(item);
     };
 
     const setupCategories = () => {
         const categories = document.querySelectorAll('.category-list li');
         const reportTitle = document.getElementById('report-title');
-
         const filterInfos = (category) => {
             const allItems = document.querySelectorAll('.data-item');
             let delay = 0;
@@ -258,23 +259,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         setTimeout(() => item.classList.add('visible'), 50 + delay * 70);
                     }, delay * 80);
                     delay++;
-                } else {
-                    item.style.display = 'none';
-                }
+                } else { item.style.display = 'none'; }
             });
             const activeCat = document.querySelector(`#cat-${category}`);
             if (activeCat) reportTitle.textContent = activeCat.textContent;
         };
-
         categories.forEach(cat => {
             cat.addEventListener('click', () => {
                 categories.forEach(c => c.classList.remove('active'));
                 cat.classList.add('active');
-                const categoryId = cat.id.replace('cat-', '');
-                filterInfos(categoryId);
+                filterInfos(cat.id.replace('cat-', ''));
             });
         });
-
         filterInfos('computer');
     };
 
@@ -299,31 +295,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const gatherData = async () => {
         addInfo('computer', 'Operating System', getOS(), 'danger');
         addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
-        if (navigator.deviceMemory)
-            addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
+        if (navigator.deviceMemory) addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
         addInfo('computer', 'GPU', getGpuInfo(), 'danger');
-
-        try {
-            const battery = await navigator.getBattery();
-            addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
-        } catch {}
-
-        try {
-            const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
-            addInfo('network', 'Public IP', ipData.ip, 'danger');
-        } catch {}
-
+        try { const battery = await navigator.getBattery(); addInfo('computer', 'Battery', `${(battery.level*100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`); } catch {}
+        try { const ipData = await (await fetch('https://api.ipify.org?format=json')).json(); addInfo('network', 'Public IP', ipData.ip, 'danger'); } catch {}
         addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
         addInfo('browser', 'Languages', navigator.languages.join(', '));
         addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height}`);
         addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     };
 
-    // Główna funkcja
     gatherData().then(() => {
         setupCategories();
-        // Ukrycie loadera po pełnym załadowaniu
-        setTimeout(() => loader.classList.add('hidden'), 500); 
+        setTimeout(() => loader.classList.add('hidden'), 800);
     });
 });
 </script>
