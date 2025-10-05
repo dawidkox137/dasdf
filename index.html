@@ -3,87 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Auto Dashboard</title>
+<title>System Analysis Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d1117;
-  --surface: #121519;
-  --border: #1f262c;
-  --text: #cbd6df;
-  --muted: #8b949e;
-  --accent: #58a6ff;
-  --accent2: #79c0ff;
-  --danger: #ff6b6b;
-  --warn: #ffb020;
+    --bg-color: #0d1117;
+    --surface-color: #161b22;
+    --border-color: #21262d;
+    --text-color: #c9d1d9;
+    --header-color: #f0f6fc;
+    --label-color: #8b949e;
+    --value-color: #58a6ff;
+    --accent-color: #58a6ff;
+    --accent-hover: #79c0ff;
+    --danger-color: #ff5555;
+    --warning-color: #ffc107;
 }
-* { box-sizing: border-box; margin:0; padding:0; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display:flex; justify-content:center; align-items:center; padding:20px; min-height:100vh; }
-.container { width:100%; max-width:1400px; height:90vh; display:flex; background: var(--surface); border-radius:14px; overflow:hidden; border:1px solid var(--border); box-shadow:0 14px 60px rgba(0,0,0,.6); }
-.sidebar { width:320px; padding:24px; background: linear-gradient(180deg,#111316,#0d1117); border-right:1px solid var(--border); display:flex; flex-direction:column; }
-.title { font-size:20px; font-weight:700; text-align:center; margin-bottom:14px; color:#f0f6fc; }
-.category-list { list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-.category { padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700; transition: all .18s ease; color: var(--text); background: rgba(255,255,255,.02); }
-.category:hover { transform: translateX(4px); background: rgba(88,166,255,.08); color: var(--accent2); }
-.category.active { background: var(--accent); color:#fff; box-shadow:0 0 30px rgba(88,166,255,.45); }
-.main { flex:1; padding:20px; overflow:auto; }
-.header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.h2 { font-size:18px; color:#f0f6fc; border-bottom:1px solid var(--border); padding-bottom:8px; width:100%; }
-.grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap:12px; margin-top:14px; }
-.card { background: rgba(255,255,255,.02); border-radius:12px; padding:12px; border:1px solid rgba(255,255,255,.03); transform: translateY(8px); opacity:0; transition: all .36s cubic-bezier(.2,.9,.2,1); }
-.card.visible { transform:translateY(0); opacity:1; }
-.label { display:block; color: var(--muted); font-size:13px; margin-bottom:8px; }
-.value { font-family: 'Roboto Mono', monospace; color: var(--accent); word-break: break-word; font-size:13px; }
-.value.danger { color: var(--danger); }
-.value.warn { color: var(--warn); }
-.code { font-family: 'Roboto Mono', monospace; background: rgba(255,255,255,.02); padding:8px; border-radius:8px; overflow:auto; max-height:220px; }
-.small { font-size:12px; color: var(--muted); margin-top:8px; }
-@media(max-width:920px){.container{height:100vh;border-radius:0}.sidebar{width:100%;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border)}.category-list{flex-direction:row;flex-wrap:wrap;gap:8px}}
+
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+html, body {
+    height: 100%;
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    background: var(--surface-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: fadeIn 1.2s ease-out;
+    border: 1px solid var(--border-color);
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.97);}
+    to {opacity: 1; transform: scale(1);}
+}
+
+.sidebar {
+    flex: 0 0 280px;
+    background: linear-gradient(180deg, #161b22, #0d1117);
+    padding: 2rem;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.sidebar h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    color: var(--header-color);
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+.category-list {list-style: none;}
+
+.category-list li {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: all 0.25s ease;
+    background: rgba(255,255,255,0.03);
+}
+
+.category-list li:hover {
+    background-color: rgba(88,166,255,0.15);
+    color: var(--accent-hover);
+    transform: translateX(3px);
+}
+
+.category-list li.active {
+    background: var(--accent-color);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 25px rgba(88,166,255,0.6);
+    animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0%, 100% {box-shadow: 0 0 15px rgba(88,166,255,0.4);}
+    50% {box-shadow: 0 0 30px rgba(88,166,255,0.8);}
+}
+
+.main-content {
+    flex: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+    position: relative;
+}
+
+.main-content::-webkit-scrollbar {width: 6px;}
+.main-content::-webkit-scrollbar-thumb {background: var(--border-color); border-radius: 10px;}
+
+h2 {
+    font-size: 1.4rem;
+    color: var(--header-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.data-item {
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+    background: rgba(255,255,255,0.02);
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.data-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.data-label {
+    display: block;
+    color: var(--label-color);
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.data-value {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--value-color);
+    font-size: 1rem;
+}
+
+.data-value.danger {color: var(--danger-color);}
+.data-value.warning {color: var(--warning-color);}
+
+@media (max-width: 900px) {
+    .dashboard-container {flex-direction: column; height: 100vh; max-height: none;}
+    .sidebar {flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border-color);}
+    .category-list {display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;}
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="sidebar">
-    <div class="title">Diagnostics</div>
-    <ul class="category-list">
-      <li id="cat-computer" class="category active">Computer</li>
-      <li id="cat-network" class="category">Network</li>
-      <li id="cat-browser" class="category">Browser</li>
-      <li id="cat-sensors" class="category">Sensors & Media</li>
-      <li id="cat-apis" class="category">APIs & Features</li>
-    </ul>
-  </div>
-  <div class="main">
-    <div class="header">
-      <div class="h2" id="title">Computer</div>
+
+<div class="dashboard-container">
+    <div class="sidebar">
+        <h1>Categories</h1>
+        <ul class="category-list">
+            <li id="cat-computer" class="active">Computer Info</li>
+            <li id="cat-network">Network Info</li>
+            <li id="cat-browser">Browser Info</li>
+        </ul>
     </div>
-    <div id="grid" class="grid"></div>
-  </div>
+
+    <div class="main-content">
+        <h2 id="report-title">Computer Info</h2>
+        <div id="report-content"></div>
+    </div>
 </div>
+
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
-const grid=document.getElementById('grid');
-const title=document.getElementById('title');
-const cats=document.querySelectorAll('.category');
-let DATA={computer:{},network:{},browser:{},sensors:{},apis:{}};
-function clearGrid(){grid.innerHTML='';}
-function card(cat,label,val,cls){const e=document.createElement('div');e.className='card';e.dataset.category=cat;e.innerHTML=`<div class="label">${label}</div><div class="value ${cls||''}">${val}</div>`;grid.appendChild(e);return e;}
-function cardCode(cat,label,txt){const e=document.createElement('div');e.className='card';e.dataset.category=cat;e.innerHTML=`<div class="label">${label}</div><pre class="code">${txt}</pre>`;grid.appendChild(e);return e;}
-function show(cat){const cards=document.querySelectorAll('.card');let d=0;cards.forEach(c=>{c.classList.remove('visible');if(c.dataset.category===cat){c.style.display='block';setTimeout(()=>c.classList.add('visible'),50+d*60);d++}else c.style.display='none'});const active=document.getElementById('cat-'+cat);if(active)title.textContent=active.textContent;}
-cats.forEach(c=>c.addEventListener('click',()=>{cats.forEach(x=>x.classList.remove('active'));c.classList.add('active');show(c.id.replace('cat-',''));}));
-async function gather(){clearGrid();DATA={computer:{},network:{},browser:{},sensors:{},apis:{}};
-const os=navigator.userAgent.match(/Windows|Mac|Linux|Android|iPhone|iPad|iPod/i)||['Unknown'];DATA.computer.os=os[0];card('computer','OS',os[0]);card('computer','CPU Cores',navigator.hardwareConcurrency||'Unknown');card('computer','Device Memory',navigator.deviceMemory?navigator.deviceMemory+' GB':'Unknown');
-try{const c=document.createElement('canvas').getContext('webgl2')||document.createElement('canvas').getContext('webgl');const ext=c.getExtension('WEBGL_debug_renderer_info');DATA.computer.gpu=ext?c.getParameter(ext.UNMASKED_RENDERER_WEBGL):'Unavailable';card('computer','GPU',DATA.computer.gpu);}catch(e){card('computer','GPU','Unavailable');}
-if(navigator.getBattery){const b=await navigator.getBattery();card('computer','Battery',Math.round(b.level*100)+'% '+(b.charging?'(Charging)':''));}
-const fpsEl=card('computer','FPS','0');let frames=0,last=performance.now();function fpsLoop(){frames++;const now=performance.now();if(now-last>1000){fpsEl.querySelector('.value').textContent=Math.round(frames/(now-last)*1000);frames=0;last=now;}requestAnimationFrame(fpsLoop);}fpsLoop();
-const fonts=['Arial','Verdana','Helvetica','Times New Roman','Courier New','Georgia','Palatino','Garamond','Comic Sans MS','Segoe UI','Consolas','Trebuchet MS','Impact','Roboto'];const available=[];const span=document.createElement('span');span.textContent='mmmmmmmmmmwwww';span.style.fontSize='16px';span.style.visibility='hidden';document.body.appendChild(span);for(const f of fonts){span.style.fontFamily='monospace';const mono=span.offsetWidth;span.style.fontFamily=`${f}, monospace`;if(span.offsetWidth!==mono)available.push(f)}document.body.removeChild(span);card('computer','Detected Fonts',available.join(', ')||'None');
-try{const ipRes=await fetch('https://api.ipify.org?format=json');const ipJson=await ipRes.json();DATA.network.publicIp=ipJson.ip;card('network','Public IP',ipJson.ip);}catch(e){card('network','Public IP','Unavailable','warn');}
-if(navigator.connection){card('network','Connection Type',navigator.connection.effectiveType||'Unknown');card('network','Downlink Mbps',navigator.connection.downlink||'Unknown');}
-card('browser','User Agent',navigator.userAgent);card('browser','Languages',navigator.languages?navigator.languages.join(', '):navigator.language);card('browser','Cookies Enabled',navigator.cookieEnabled?'Yes':'No');card('browser','Screen',`${screen.width}x${screen.height} @ ${screen.colorDepth}bit`);
-card('sensors','Device Orientation',typeof DeviceOrientationEvent!=='undefined'?'Supported':'Unsupported');card('sensors','Device Motion',typeof DeviceMotionEvent!=='undefined'?'Supported':'Unsupported');card('sensors','Device Light',typeof AmbientLightSensor!=='undefined'?'Supported':'Unsupported');
-card('apis','Service Worker',!!navigator.serviceWorker?'Supported':'Unsupported');card('apis','Clipboard',!!navigator.clipboard?'Supported':'Unsupported');card('apis','Payment Request',!!window.PaymentRequest?'Supported':'Unsupported');card('apis','Web Bluetooth',!!navigator.bluetooth?'Supported':'Unsupported');card('apis','Web USB',!!navigator.usb?'Supported':'Unsupported');card('apis','Web Share',!!navigator.share?'Supported':'Unsupported');card('apis','Web NFC',!!navigator.nfc?'Supported':'Unsupported');card('apis','Permissions API',!!navigator.permissions?'Supported':'Unsupported');
-window.__DIAG_DATA=DATA;show('computer');}
-gather();
+document.addEventListener('DOMContentLoaded', () => {
+    const reportContent = document.getElementById('report-content');
+
+    const addInfo = (category, label, value, type = '') => {
+        if (!value && typeof value !== 'number') value = 'N/A';
+        const item = document.createElement('div');
+        item.className = 'data-item';
+        item.dataset.category = category;
+        item.innerHTML = `
+            <span class="data-label">${label}</span>
+            <span class="data-value ${type}">${value}</span>`;
+        reportContent.appendChild(item);
+    };
+
+    const setupCategories = () => {
+        const categories = document.querySelectorAll('.category-list li');
+        const reportTitle = document.getElementById('report-title');
+
+        const filterInfos = (category) => {
+            const allItems = document.querySelectorAll('.data-item');
+            let delay = 0;
+            allItems.forEach(item => {
+                item.classList.remove('visible');
+                if (item.dataset.category === category) {
+                    setTimeout(() => {
+                        item.style.display = 'block';
+                        setTimeout(() => item.classList.add('visible'), 50 + delay * 70);
+                    }, delay * 80);
+                    delay++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            const activeCat = document.querySelector(`#cat-${category}`);
+            if (activeCat) reportTitle.textContent = activeCat.textContent;
+        };
+
+        categories.forEach(cat => {
+            cat.addEventListener('click', () => {
+                categories.forEach(c => c.classList.remove('active'));
+                cat.classList.add('active');
+                const categoryId = cat.id.replace('cat-', '');
+                filterInfos(categoryId);
+            });
+        });
+
+        filterInfos('computer');
+    };
+
+    const getOS = () => {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android";
+        if (/iPad|iPhone|iPod/.test(ua)) return "iOS";
+        if (/linux/i.test(ua)) return "Linux";
+        if (/macintosh|mac os x/i.test(ua)) return "macOS";
+        if (/windows|win32/i.test(ua)) return "Windows";
+        return navigator.platform;
+    };
+
+    const getGpuInfo = () => {
+        try {
+            const gl = document.createElement('canvas').getContext('webgl');
+            const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            return rendererInfo ? gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) : 'Unavailable';
+        } catch { return 'Unavailable'; }
+    };
+
+    const gatherData = async () => {
+        addInfo('computer', 'Operating System', getOS(), 'danger');
+        addInfo('computer', 'CPU Cores', navigator.hardwareConcurrency, 'warning');
+        if (navigator.deviceMemory)
+            addInfo('computer', 'Memory (est.)', `${navigator.deviceMemory}GB`, 'warning');
+        addInfo('computer', 'GPU', getGpuInfo(), 'danger');
+
+        try {
+            const battery = await navigator.getBattery();
+            addInfo('computer', 'Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(Charging)' : ''}`);
+        } catch {}
+
+        try {
+            const ipData = await (await fetch('https://api.ipify.org?format=json')).json();
+            addInfo('network', 'Public IP', ipData.ip, 'danger');
+        } catch {}
+
+        addInfo('browser', 'User Agent', navigator.userAgent, 'danger');
+        addInfo('browser', 'Languages', navigator.languages.join(', '));
+        addInfo('browser', 'Screen Resolution', `${screen.width}x${screen.height}`);
+        addInfo('browser', 'Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    };
+
+    gatherData().then(() => setupCategories());
+});
 </script>
+
 </body>
 </html>
