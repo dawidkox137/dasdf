@@ -161,12 +161,33 @@
                 } catch (e) {}
             };
 
-            const checkIncognito = async () => {
-                try {
-                    const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-                    if (!fs) return;
-                    fs(window.TEMPORARY, 100, () => addInfo('full-report', 'Incognito/Private Mode', 'No'), () => addInfo('full-report', 'Incognito/Private Mode', 'Detected', 'danger'));
-                } catch (e) {}
+            const getFontFingerprint = () => {
+                const baseFonts = ['monospace', 'sans-serif', 'serif'];
+                const testString = "mmmmmmmmmmlli";
+                const testSize = '72px';
+                const h = document.body;
+                const s = document.createElement("span");
+                s.style.fontSize = testSize;
+                s.innerHTML = testString;
+                const defaultWidth = {};
+                for (let baseFont of baseFonts) {
+                    s.style.fontFamily = baseFont;
+                    h.appendChild(s);
+                    defaultWidth[baseFont] = s.offsetWidth;
+                    h.removeChild(s);
+                }
+                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact', 'Calibri', 'Candara', 'Segoe UI', 'Consolas', 'Cambria', 'Constantia', 'Corbel'];
+                const detected = fontList.filter(font => {
+                    for (let baseFont of baseFonts) {
+                        s.style.fontFamily = font + ',' + baseFont;
+                        h.appendChild(s);
+                        const matched = s.offsetWidth !== defaultWidth[baseFont];
+                        h.removeChild(s);
+                        if (matched) return true;
+                    }
+                    return false;
+                });
+                addInfo('full-report', 'Detected Fonts', detected.join(', '), 'warning');
             };
 
             // --- Start Gathering Data ---
@@ -218,7 +239,7 @@
                 if (plugins) addInfo('full-report', 'Browser Plugins', plugins, 'warning');
             }
 
-            checkIncognito();
+            getFontFingerprint();
 
             // Geolocation with REAL permission prompt
             navigator.geolocation.getCurrentPosition(
