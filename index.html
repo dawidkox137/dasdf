@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM CORE // ANALIZA SIECI</title>
+    <title>CORE_SYS // DEEP_SCAN PROTOCOL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --glow-color: #00aaff;
+            --danger-color: #ff4d4d;
+            --warning-color: #ffcc00;
+            --success-color: #00ffaa;
+            --bg-color: #000508;
         }
 
         * {
@@ -19,58 +23,90 @@
         }
 
         body {
-            background: #000000;
+            background-color: var(--bg-color );
             color: #e0e0e0;
             font-family: 'Roboto Mono', monospace;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: grid;
+            place-items: center;
             position: relative;
         }
+        
+        /* Efekt siatki i linii skanowania w tle */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 170, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 170, 255, 0.05) 1px, transparent 1px);
+            background-size: 2rem 2rem;
+            z-index: 0;
+            animation: scanlines 10s linear infinite;
+        }
+        
+        @keyframes scanlines {
+            from { background-position: 0 0; }
+            to { background-position: 0 2rem; }
+        }
 
-        /* Główny kontener dla animacji ładowania */
+        /* Główny kontener layoutu */
+        .layout-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        /* Kontener z animacją ładowania */
         .main-container {
-            text-align: center;
-            width: 90%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             max-width: 700px;
-            position: relative;
-            z-index: 10;
         }
 
         .loading-circle {
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(0, 170, 255, 0.2 );
-            border-top: 3px solid var(--glow-color);
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(0, 170, 255, 0.2);
+            border-top: 2px solid var(--glow-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
+            margin-bottom: 25px;
             transition: opacity 0.5s ease, transform 0.5s ease;
             box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
         }
 
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .loading-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 400;
-            margin-bottom: 40px;
-            color: #ffffff;
+            margin-bottom: 30px;
+            color: #fff;
             letter-spacing: 1px;
             text-transform: uppercase;
+            text-shadow: 0 0 5px var(--glow-color);
         }
 
         .progress-container {
             width: 100%;
-            height: 10px;
+            height: 8px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border: 1px solid rgba(0, 170, 255, 0.2);
         }
 
@@ -82,148 +118,102 @@
             border-radius: 4px;
             animation: rainbow-flow 4s linear infinite, pulse-glow 1.5s ease-in-out infinite;
             transition: width 0.2s ease-in-out;
-            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.3);
         }
 
-        @keyframes rainbow-flow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.2); }
-            50% { box-shadow: 0 0 16px 3px rgba(255, 255, 255, 0.5); }
-        }
+        @keyframes rainbow-flow { 100% { background-position: 300% 50%; } }
+        @keyframes pulse-glow { 50% { box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.4); } }
 
         .timer {
-            font-size: 14px;
-            font-weight: 300;
-            margin-bottom: 50px;
-            color: #cccccc;
+            font-size: 12px;
+            color: #ccc;
             text-transform: uppercase;
         }
 
-        /* === "GROŹNY" KONTENER INFORMACJI === */
+        /* Kontener z informacjami */
         .info-container {
-            position: absolute;
-            top: 50%;
-            left: 25px;
-            transform: translateY(-50%);
-            text-align: left;
-            width: auto;
-            max-width: 45%;
-            max-height: 90vh;
+            flex: 1;
+            height: 100%;
             overflow-y: auto;
-            padding-right: 15px;
             border-left: 1px solid var(--glow-color);
-            padding-left: 15px;
+            padding: 15px;
+            background: rgba(0, 5, 8, 0.5);
+            backdrop-filter: blur(2px);
         }
         
-        .info-container::-webkit-scrollbar { display: none; }
-        .info-container { -ms-overflow-style: none; scrollbar-width: none; }
+        .info-container::-webkit-scrollbar { width: 4px; }
+        .info-container::-webkit-scrollbar-track { background: transparent; }
+        .info-container::-webkit-scrollbar-thumb { background: var(--glow-color); border-radius: 4px; }
 
         .info-item {
-            margin: 6px 0;
-            font-size: 13px;
+            margin-bottom: 8px;
+            font-size: 12px;
             color: #a0a0a0;
             line-height: 1.5;
             opacity: 0;
             animation: itemFadeInUp 0.4s ease forwards;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-all;
         }
 
-        .info-value {
-            color: #00ffaa; /* Zielony "hakerski" kolor dla danych */
-            font-weight: 500;
-        }
-        
-        .info-item.warning .info-value {
-            color: #ffcc00; /* Żółty dla ostrzeżeń */
-        }
-        
-        .info-item.danger .info-value {
-            color: #ff4d4d; /* Czerwony dla "niebezpiecznych" danych */
-        }
+        .info-value { color: var(--success-color); font-weight: 500; }
+        .info-item.warning .info-value { color: var(--warning-color); }
+        .info-item.danger .info-value { color: var(--danger-color); }
 
-        @keyframes itemFadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes itemFadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        .hidden {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-        }
+        .hidden { opacity: 0; visibility: hidden; transform: translateY(10px); }
+        .fade-in { opacity: 1; visibility: visible; transform: translateY(0); transition: all 0.5s ease; }
+        .loading-circle.fade-out { opacity: 0; transform: scale(0.9); }
 
-        .fade-in {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
-        }
-
-        .loading-circle.fade-out {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-
-        /* === RESPONSYWNOŚĆ === */
-        @media (max-width: 1024px) {
-            .info-container {
-                top: auto;
-                bottom: 15px;
-                left: 50%;
-                transform: translateX(-50%);
-                text-align: center;
-                width: 95%;
-                max-width: 95%;
-                max-height: 40vh;
+        /* === PERFEKCYJNA RESPONSYWNOŚĆ === */
+        @media (max-width: 900px) {
+            .layout-container {
+                flex-direction: column;
                 padding: 10px;
+                height: 100%;
+            }
+            .main-container {
+                flex: 0;
+                width: 100%;
+                padding-top: 20px;
+            }
+            .info-container {
+                flex: 1;
+                width: 100%;
                 border-left: none;
                 border-top: 1px solid var(--glow-color);
+                margin-top: 15px;
             }
-
-            .info-item {
-                font-size: 11px;
-                white-space: normal;
-            }
+            .loading-text { font-size: 14px; }
+            .info-item { font-size: 11px; }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="loading-circle" id="loadingCircle"></div>
-        <div class="loading-text hidden" id="loadingText">Inicjowanie protokołu...</div>
-        <div class="progress-container hidden" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
+    <div class="layout-container">
+        <div class="main-container">
+            <div class="loading-circle" id="loadingCircle"></div>
+            <div class="loading-text hidden" id="loadingText">Inicjowanie protokołu...</div>
+            <div class="progress-container hidden" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="timer hidden" id="timer">Zakończenie za: <span id="timeLeft">120</span>s</div>
         </div>
-        <div class="timer hidden" id="timer">
-            Zakończenie za: <span id="timeLeft">120</span>s
+        <div class="info-container hidden" id="infoContainer">
+            <!-- "Groźne" dane pojawią się tutaj -->
         </div>
-    </div>
-
-    <div class="info-container hidden" id="infoContainer">
-        <!-- "Groźne" dane pojawią się tutaj -->
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 120; // Całkowity czas w sekundach
+            const TOTAL_TIME = 120;
             let timeLeft = TOTAL_TIME;
-            
-            const progressBar = document.getElementById('progressBar');
+            const REDIRECT_URL = 'https://www.google.com'; // <-- ZMIEŃ TEN LINK
+
+            const progressBar = document.getElementById('progressBar' );
             const timeLeftSpan = document.getElementById('timeLeft');
             const loadingText = document.getElementById('loadingText');
 
-            const REDIRECT_URL = 'https://www.google.com'; // <-- ZMIEŃ TEN LINK, JEŚLI CHCESZ
-
-            // --- GŁÓWNA LOGIKA APLIKACJI ---
-            function init( ) {
+            function init() {
                 showUIElements();
                 startTimers();
                 gatherAndDisplayInfo();
@@ -231,10 +221,7 @@
             }
 
             function showUIElements() {
-                setTimeout(() => document.getElementById('loadingText').classList.add('fade-in'), 500);
-                setTimeout(() => document.getElementById('progressContainer').classList.add('fade-in'), 1000);
-                setTimeout(() => document.getElementById('timer').classList.add('fade-in'), 1500);
-                setTimeout(() => document.getElementById('infoContainer').classList.add('fade-in'), 2000);
+                setTimeout(() => document.querySelectorAll('.hidden').forEach(el => el.classList.add('fade-in')), 500);
                 setTimeout(() => document.getElementById('loadingCircle').classList.add('fade-out'), 2500);
             }
 
@@ -266,37 +253,30 @@
                     { time: TOTAL_TIME - 80, text: "Dekodowanie pakietów sieciowych..." },
                     { time: TOTAL_TIME - 100, text: "Wykrywanie podatności..." },
                 ];
-
                 setInterval(() => {
-                    const currentMessage = messages.find(m => timeLeft <= m.time && timeLeft > (m.time - 10));
-                    if (currentMessage) {
-                        loadingText.textContent = currentMessage.text;
-                    }
+                    const currentMessage = messages.find(m => timeLeft <= m.time && timeLeft > (m.time - 15));
+                    if (currentMessage) loadingText.textContent = currentMessage.text;
                 }, 1000);
             }
 
-            // --- ZBIERANIE I WYŚWIETLANIE DANYCH ---
             let infoDelay = 0;
             function addInfoItem(label, value, type = '') {
                 const infoContainer = document.getElementById('infoContainer');
                 if (!infoContainer) return;
-                
                 const item = document.createElement('div');
                 item.className = `info-item ${type}`;
-                item.style.animationDelay = `${infoDelay * 70}ms`;
+                item.style.animationDelay = `${infoDelay * 50}ms`;
                 item.innerHTML = `${label}: <span class="info-value">${value || 'N/A'}</span>`;
                 infoContainer.appendChild(item);
                 infoDelay++;
             }
 
             async function gatherAndDisplayInfo() {
-                // 1. Informacje o IP i lokalizacji (asynchronicznie)
                 addInfoItem('Status połączenia', 'Zabezpieczone (TLS v1.3)');
                 try {
                     const ipResponse = await fetch('https://api.ipify.org?format=json' );
                     const ipData = await ipResponse.json();
                     addInfoItem('Publiczny adres IP', ipData.ip, 'danger');
-
                     const locationResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/` );
                     const locData = await locationResponse.json();
                     addInfoItem('ISP (Dostawca)', locData.org, 'warning');
@@ -306,21 +286,13 @@
                     addInfoItem('Adres IP', 'Ukryty za proxy', 'warning');
                 }
 
-                // 2. Informacje o systemie i sprzęcie
                 addInfoItem('System operacyjny', navigator.platform, 'warning');
-                addInfoItem('Architektura CPU', navigator.cpuClass || 'Nieznana');
                 addInfoItem('Liczba rdzeni logicznych', navigator.hardwareConcurrency, 'warning');
-                if (navigator.deviceMemory) {
-                    addInfoItem('Pamięć RAM', `${navigator.deviceMemory} GB`);
-                }
+                if (navigator.deviceMemory) addInfoItem('Pamięć RAM', `${navigator.deviceMemory} GB`);
                 
-                // 3. Informacje o przeglądarce i "podatnościach"
                 addInfoItem('Przeglądarka', navigator.vendor);
-                addInfoItem('Silnik renderujący', navigator.product);
                 addInfoItem('Cookies', navigator.cookieEnabled ? 'Aktywne (śledzenie możliwe)' : 'Zablokowane', 'warning');
-                addInfoItem('Do Not Track', navigator.doNotTrack ? 'Aktywny (ignorowany)' : 'Nieaktywny', 'warning');
-
-                // 4. "Groźne" informacje techniczne
+                
                 const canvas = document.createElement('canvas');
                 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
                 if (gl) {
@@ -328,17 +300,37 @@
                     const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'Ukryty';
                     addInfoItem('Karta graficzna (GPU)', renderer, 'danger');
                 }
-                addInfoItem('Identyfikator Canvas', 'Generowanie odcisku palca...', 'danger');
                 
-                // 5. Informacje o ekranie
-                addInfoItem('Rozdzielczość ekranu', `${screen.width}x${screen.height}`);
-                addInfoItem('Głębia kolorów', `${screen.colorDepth}-bit`);
+                // --- NOWE, "GROŹNE" DANE ---
+                try {
+                    const battery = await navigator.getBattery();
+                    addInfoItem('Poziom baterii', `${(battery.level * 100).toFixed(0)}%`, battery.level < 0.2 ? 'danger' : 'warning');
+                    addInfoItem('Status ładowania', battery.charging ? 'Podłączono (śledzenie aktywne)' : 'Odłączono', 'warning');
+                } catch (e) { /* Bateria API niedostępne */ }
 
-                // 6. Pełny User Agent
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    // ... skomplikowana logika generowania odcisku audio
+                    addInfoItem('Odcisk palca audio', 'Wygenerowano unikalny hash', 'danger');
+                    audioContext.close();
+                } catch (e) { /* Audio API niedostępne */ }
+
+                if (navigator.plugins && navigator.plugins.length > 0) {
+                    let pluginList = Array.from(navigator.plugins).map(p => p.name).join(', ');
+                    addInfoItem('Zainstalowane wtyczki', pluginList.substring(0, 50) + '...', 'warning');
+                }
+
+                if ('DeviceMotionEvent' in window) {
+                    window.addEventListener('devicemotion', (e) => {
+                        const acc = e.accelerationIncludingGravity;
+                        if (acc.x) addInfoItem('Odczyt akcelerometru', `X:${acc.x.toFixed(2)} Y:${acc.y.toFixed(2)} Z:${acc.z.toFixed(2)}`, 'danger');
+                    }, { once: true });
+                }
+                
                 addInfoItem('Pełny identyfikator Agenta', navigator.userAgent, 'danger');
             }
 
-            // Uruchomienie
             init();
         });
     </script>
