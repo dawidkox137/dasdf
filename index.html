@@ -3,135 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM_CORE :: DATA_STREAM</title>
+    <title>System & Network Analysis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --main-color: #d92027;
-            --danger-color: #ff3b3b;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --bg-color: #000000;
-            --text-color: #f8f9fa;
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --header-color: #ffffff;
+            --label-color: #bbbbbb;
+            --value-color: #4db8ff;
+            --danger-color: #ff4d4d;
+            --border-color: #333333;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 12px; }
+        html { font-size: 14px; }
         body {
             background-color: var(--bg-color );
             color: var(--text-color);
             font-family: 'Roboto Mono', monospace;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
             display: flex;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(217, 32, 39, 0.04) 1px, transparent 1px);
-            background-size: 1.5rem 1.5rem;
-            animation: scanlines 12s linear infinite;
-        }
-        @keyframes scanlines { to { background-position: 0 1.5rem; } }
-        .layout-container {
-            display: flex;
-            width: 100%; height: 100%;
-            padding: 1rem; gap: 1.5rem;
-            z-index: 1;
-        }
-        .main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            max-width: 500px;
+            min-height: 100vh;
+            padding: 2rem;
         }
-        .loading-text {
-            font-size: 1.5rem; font-weight: 700;
+        .report-container {
+            width: 100%;
+            max-width: 800px;
+            background: #1e1e1e;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        h1 {
+            text-align: center;
+            color: var(--header-color);
+            font-size: 1.5rem;
             margin-bottom: 2rem;
-            color: var(--text-color);
-            letter-spacing: 0.2rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px var(--main-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
         }
-        .progress-container {
-            width: 100%; height: 3px;
-            background: rgba(217, 32, 39, 0.1);
+        .data-section {
+            margin-bottom: 2rem;
+        }
+        .data-section h2 {
+            color: var(--header-color);
+            font-size: 1.2rem;
             margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
         }
-        .progress-bar {
-            height: 100%; width: 0%;
-            background: var(--main-color);
-            box-shadow: 0 0 12px 1px var(--main-color);
-            transition: width 0.1s linear;
-        }
-        .timer { font-size: 1rem; color: #ccc; }
-        .info-container {
-            flex: 1.8;
-            height: 100%;
-            overflow-y: auto;
-            border-left: 1px solid var(--main-color);
-            padding-left: 1.5rem;
-            background: rgba(0, 0, 0, 0.6);
-        }
-        .info-container::-webkit-scrollbar { width: 3px; }
-        .info-container::-webkit-scrollbar-track { background: transparent; }
-        .info-container::-webkit-scrollbar-thumb { background: var(--main-color); }
-        .info-item {
-            margin-bottom: 0.7rem;
-            color: #a0a0a0;
-            opacity: 0;
-            animation: itemFadeIn 0.2s ease forwards;
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
             word-break: break-all;
         }
-        .info-value { color: var(--info-color); }
-        .info-item.warning .info-value { color: var(--warning-color); }
-        .info-item.danger .info-value { color: var(--danger-color); font-weight: 700; }
-        @keyframes itemFadeIn { to { opacity: 1; } }
-        .hidden { opacity: 0; }
-        .fade-in { opacity: 1; transition: opacity 0.5s ease; }
-        @media (max-width: 900px) {
-            .layout-container { flex-direction: column; }
-            .main-container { flex: 0; }
-            .info-container { flex: 1; width: 100%; border-left: none; border-top: 1px solid var(--main-color); padding-top: 1rem; padding-left: 0; }
+        .data-label {
+            color: var(--label-color);
+            padding-right: 1rem;
+        }
+        .data-value {
+            color: var(--value-color);
+            text-align: right;
+        }
+        .data-value.danger {
+            color: var(--danger-color);
+            font-weight: 700;
+        }
+        @media (max-width: 600px) {
+            html { font-size: 12px; }
+            body { padding: 1rem; }
+            .report-container { padding: 1.5rem; }
+            .data-item { flex-direction: column; align-items: flex-start; }
+            .data-value { text-align: left; margin-top: 0.2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="layout-container">
-        <div class="main-container">
-            <div class="loading-text hidden fade-in">DATA STREAM ACTIVE</div>
-            <div class="progress-container hidden fade-in">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="timer hidden fade-in">SESSION TERMINATES IN: <span id="timeLeft">25</span>s</div>
+    <div class="report-container">
+        <h1>System & Network Analysis Report</h1>
+
+        <div class="data-section" id="network-info">
+            <h2>Network Information</h2>
         </div>
-        <div class="info-container hidden fade-in" id="infoContainer"></div>
+
+        <div class="data-section" id="device-info">
+            <h2>Device Information</h2>
+        </div>
+
+        <div class="data-section" id="browser-details">
+            <h2>Browser Details</h2>
+        </div>
+
+        <div class="data-section" id="access-details">
+            <h2>Access Details</h2>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const TOTAL_TIME = 25;
-            const REDIRECT_URL = 'https://www.google.com/search?q=CERT+Polska+zgłoś+incydent';
-            let timeLeft = TOTAL_TIME;
-            let infoDelay = 0;
-
-            const progressBar = document.getElementById('progressBar' );
-            const timeLeftSpan = document.getElementById('timeLeft');
-            const infoContainer = document.getElementById('infoContainer');
-
-            const addInfo = (label, value, type = '') => {
-                if (!value && typeof value !== 'number') return;
+        document.addEventListener('DOMContentLoaded', async () => {
+            const addInfo = (sectionId, label, value, type = '') => {
+                if (!value && typeof value !== 'number') value = 'N/A';
+                const section = document.getElementById(sectionId);
                 const item = document.createElement('div');
-                item.className = `info-item ${type}`;
-                item.style.animationDelay = `${infoDelay * 15}ms`;
-                item.innerHTML = `${label}: <span class="info-value">${value}</span>`;
-                infoContainer.appendChild(item);
-                infoDelay++;
+                item.className = 'data-item';
+                item.innerHTML = `<span class="data-label">${label}:</span><span class="data-value ${type}">${value}</span>`;
+                section.appendChild(item);
             };
 
             const getOS = () => {
@@ -149,140 +131,75 @@
                     const gl = document.createElement('canvas').getContext('webgl');
                     const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
                     return gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL);
-                } catch (e) { return 'Masked/Unavailable'; }
+                } catch (e) { return 'Unavailable'; }
             };
 
-            const getLocalIp = () => {
-                try {
-                    const pc = new RTCPeerConnection();
-                    pc.createDataChannel('');
-                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
-                    pc.onicecandidate = e => {
-                        if (e.candidate) {
-                            const ip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)?.[1];
-                            if (ip) addInfo('Local IP', ip, 'danger');
-                            pc.onicecandidate = null;
-                        }
-                    };
-                } catch (e) {}
-            };
-            
-            const getFontFingerprint = () => {
-                const baseFonts = ['monospace', 'sans-serif', 'serif'];
-                const testString = "mmmmmmmmmmlli";
-                const testSize = '72px';
-                const h = document.body;
-                const s = document.createElement("span");
-                s.style.fontSize = testSize;
-                s.innerHTML = testString;
-                const defaultWidth = {};
-                for (let baseFont of baseFonts) {
-                    s.style.fontFamily = baseFont;
-                    h.appendChild(s);
-                    defaultWidth[baseFont] = s.offsetWidth;
-                    h.removeChild(s);
-                }
-                const fontList = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Impact', 'Calibri', 'Candara', 'Segoe UI'];
-                const detected = fontList.filter(font => {
-                    for (let baseFont of baseFonts) {
-                        s.style.fontFamily = font + ',' + baseFont;
-                        h.appendChild(s);
-                        const matched = s.offsetWidth !== defaultWidth[baseFont];
-                        h.removeChild(s);
-                        if (matched) return true;
-                    }
-                    return false;
-                });
-                addInfo('Installed Fonts', detected.join(', '), 'warning');
-            };
+            // --- Network Information ---
+            try {
+                const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
+                addInfo('network-info', 'IP Address', ipData.ip, 'danger');
+                const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
+                addInfo('network-info', 'ISP', locData.org);
+                addInfo('network-info', 'Location', `${locData.city}, ${locData.region}, ${locData.country_name}`);
+                addInfo('network-info', 'Postal Code', locData.postal);
+            } catch (e) {
+                addInfo('network-info', 'IP Address', 'Unavailable');
+            }
+            if (navigator.connection) {
+                addInfo('network-info', 'Connection Type', navigator.connection.effectiveType);
+                addInfo('network-info', 'Connection Speed', `${navigator.connection.downlink} Mbps`);
+            }
 
-            const checkPermissions = async () => {
-                const permissions = ['geolocation', 'notifications', 'clipboard-read'];
-                for (const p of permissions) {
-                    try {
-                        const status = await navigator.permissions.query({ name: p });
-                        addInfo(`Permission: ${p}`, status.state, status.state === 'granted' ? 'danger' : 'warning');
-                    } catch (e) {}
-                }
-            };
+            // --- Geolocation Data (with real permission request) ---
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    addInfo('network-info', 'Precise Geolocation', `${pos.coords.latitude}, ${pos.coords.longitude}`, 'danger');
+                    addInfo('network-info', 'GPS Accuracy', `${pos.coords.accuracy} meters`, 'danger');
+                },
+                (err) => {
+                    addInfo('network-info', 'Precise Geolocation', 'Access Denied', 'danger');
+                },
+                { enableHighAccuracy: true }
+            );
 
-            const requestGeolocation = () => {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        addInfo('PRECISE GPS', `${pos.coords.latitude}, ${pos.coords.longitude} (acc: ${pos.coords.accuracy}m)`, 'danger');
-                    },
-                    (err) => {
-                        addInfo('PRECISE GPS', 'Access Denied by User', 'danger');
-                    },
-                    { enableHighAccuracy: true }
-                );
-            };
+            // --- Device Information ---
+            addInfo('device-info', 'Platform', getOS(), 'danger');
+            addInfo('device-info', 'Screen Resolution', `${screen.width}x${screen.height}`);
+            addInfo('device-info', 'Color Depth', `${screen.colorDepth}-bit`);
+            addInfo('device-info', 'CPU Cores', navigator.hardwareConcurrency);
+            if (navigator.deviceMemory) addInfo('device-info', 'Memory', `${navigator.deviceMemory}GB`);
+            addInfo('device-info', 'Touch Support', navigator.maxTouchPoints > 0 ? 'Yes' : 'No');
+            try {
+                const battery = await navigator.getBattery();
+                addInfo('device-info', 'Battery Level', `${(battery.level * 100).toFixed(0)}%`);
+                addInfo('device-info', 'Charging', battery.charging ? 'Yes' : 'No');
+            } catch (e) {}
 
-            const gatherData = async () => {
-                addInfo('Operating System', getOS(), 'danger');
-                addInfo('CPU Cores', navigator.hardwareConcurrency, 'danger');
-                if (navigator.deviceMemory) addInfo('RAM (est.)', `${navigator.deviceMemory} GB`, 'danger');
-                addInfo('GPU', getGpuInfo(), 'danger');
-                
-                getLocalIp();
-                try {
-                    const ipData = await (await fetch('https://api.ipify.org?format=json' )).json();
-                    addInfo('Public IP', ipData.ip, 'danger');
-                    const locData = await (await fetch(`https://ipapi.co/${ipData.ip}/json/` )).json();
-                    addInfo('ISP', locData.org, 'warning');
-                    addInfo('Location', `${locData.city}, ${locData.country_name}`, 'danger');
-                    addInfo('Coordinates (IP)', `${locData.latitude}, ${locData.longitude}`, 'danger');
-                    if (locData.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
-                        addInfo('VPN/Proxy', 'Detected', 'danger');
-                    }
-                } catch (e) {}
-                if (navigator.connection) {
-                    addInfo('Connection', navigator.connection.effectiveType, 'warning');
-                    addInfo('Downlink', `${navigator.connection.downlink} Mbps`, 'warning');
-                }
+            // --- Browser Details ---
+            addInfo('browser-details', 'User Agent', navigator.userAgent);
+            addInfo('browser-details', 'Language', navigator.language);
+            addInfo('browser-details', 'Cookies', navigator.cookieEnabled ? 'Enabled' : 'Disabled');
+            addInfo('browser-details', 'Do Not Track', navigator.doNotTrack || 'Not Set');
+            addInfo('browser-details', 'WebGL Renderer', getGpuInfo());
 
-                addInfo('User Agent', navigator.userAgent, 'danger');
-                addInfo('Languages', navigator.languages.join(', '), 'warning');
-                addInfo('Screen', `${screen.width}x${screen.height} @ ${screen.colorDepth}bit`, 'danger');
-                addInfo('Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone, 'warning');
-                addInfo('Cookies Enabled', navigator.cookieEnabled, 'danger');
-                
-                try {
-                    const battery = await navigator.getBattery();
-                    addInfo('Battery', `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '(CHARGING)' : ''}`, 'warning');
-                } catch (e) {}
-
-                try {
-                    const devices = await navigator.mediaDevices.enumerateDevices();
-                    devices.forEach(d => d.label && addInfo(d.kind, d.label, 'danger'));
-                } catch (e) {}
-                
-                if (navigator.plugins) {
-                    const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
-                    if (plugins) addInfo('Browser Plugins', plugins, 'warning');
-                }
-
-                getFontFingerprint();
-                await checkPermissions();
-                requestGeolocation(); // This will trigger the REAL permission prompt
-            };
-
-            const init = () => {
-                document.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
-                const timerInterval = setInterval(() => {
-                    timeLeft--;
-                    if (timeLeftSpan) timeLeftSpan.textContent = timeLeft;
-                    progressBar.style.width = `${(TOTAL_TIME - timeLeft) / TOTAL_TIME * 100}%`;
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        document.querySelector('.loading-text').textContent = "STREAM TERMINATED";
-                        setTimeout(() => window.location.href = REDIRECT_URL, 1500);
-                    }
-                }, 1000);
-                gatherData();
-            };
-
-            init();
+            // --- Access Details ---
+            addInfo('access-details', 'Referrer', document.referrer || 'Direct Access');
+            addInfo('access-details', 'Timestamp', new Date().toLocaleString());
+            addInfo('access-details', 'Page URL', window.location.href);
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                addInfo('access-details', 'Local Storage', 'Supported');
+            } catch (e) {
+                addInfo('access-details', 'Local Storage', 'Not Supported');
+            }
+            try {
+                sessionStorage.setItem('test', 'test');
+                sessionStorage.removeItem('test');
+                addInfo('access-details', 'Session Storage', 'Supported');
+            } catch (e) {
+                addInfo('access-details', 'Session Storage', 'Not Supported');
+            }
         });
     </script>
 </body>
